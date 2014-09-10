@@ -1,0 +1,16 @@
+[
+{
+  "modid": "autocompressor",
+  "name": "Auto Compressor",
+  "description": "Block compressor powered by RF.",
+  "version": "0.1a",
+  "mcversion": "@MCVERSION@",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["lysidia"],
+  "credits": "Lysidia",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
