@@ -13,31 +13,39 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.common.util.ForgeDirection;
+import cofh.api.energy.EnergyStorage;
+import cofh.api.energy.IEnergyHandler;
 
 public class TileEntityAutoCompressor extends TileEntity implements
-		ISidedInventory {
+		ISidedInventory, IEnergyHandler {
+	// Variables
 	private ItemStack[] acInv;
-
 	private int acItemCount;
 	private ItemStack acInventory;
-
 	private SlotCrafting craftSlot;
+	private IRecipe craftingRecipe;
 
+	public InventoryCrafting craftMatrix = new AutoCompressorCrafting();
+	private InventoryCraftResult craftResult = new InventoryCraftResult();
+
+	protected EnergyStorage acEnergyStorage = new EnergyStorage(5000);
+
+	// How much energy is used per block of the recipe.
+	private int energyPerBlock = 100;
+
+	// Start functions below
 	public TileEntityAutoCompressor() {
 		acInv = new ItemStack[10];
 	}
 
+	// Not even sure if this gets called.
 	public boolean shouldDropSlotWhenBroken(int slot) {
 
 		return false;
 	}
 
-	public InventoryCrafting craftMatrix = new AutoCompressorCrafting();
-	private InventoryCraftResult craftResult = new InventoryCraftResult();
-	private IRecipe craftingRecipe;
-
 	private class AutoCompressorCrafting extends InventoryCrafting {
-
 		public AutoCompressorCrafting() {
 			super(new Container() {
 				@Override
@@ -94,42 +102,46 @@ public class TileEntityAutoCompressor extends TileEntity implements
 		try {
 			if ((acInv[0] != null) && (acInv[1] == null)) {
 				int inputItems = acInv[0].stackSize;
+				int energyStored = acEnergyStorage.getEnergyStored();
 
-				// DebugOut.debugMessage("updateEntity", "inputItems = "+
+				// DebugOut.debugMessage("updateEntity", "RF Stored: "
+				// + energyStored);
+
+				// DebugOut.debugMessage("updateEntity", "inputItems: "+
 				// inputItems);
 
 				// Horrible pattern kludge, that works beautifully, but still
 				// feels wrong to do :)
 				if ((inputItems >= 4)
-						&& (checkMatrix(acInv[0], "XX XX    ") != null)) {
+						&& (checkMatrix(acInv[0], "XX XX    ") != null)
+						&& (energyStored >= (energyPerBlock * 4))) {
 					// Pattern:
 					// xx
 					// xx
 					//
 					acInv[1] = checkMatrix(acInv[0], "XX XX    ");
 					inputItems -= 4;
-					// DebugOut.debugMessage("updateEntity", "(inputItems-4) ="+
-					// inputItems);
+					energyStored -= (energyPerBlock * 4);
 				} else if ((inputItems >= 8)
-						&& (checkMatrix(acInv[0], "XXXX XXXX") != null)) {
+						&& (checkMatrix(acInv[0], "XXXX XXXX") != null)
+						&& (energyStored >= (energyPerBlock * 8))) {
 					// Pattern:
 					// xxx
 					// x x
 					// xxx
 					acInv[1] = checkMatrix(acInv[0], "XXXX XXXX");
 					inputItems -= 8;
-					// DebugOut.debugMessage("updateEntity",
-					// "(inputItems-9) = "+ inputItems);
+					energyStored -= (energyPerBlock * 8);
 				} else if ((inputItems >= 9)
-						&& (checkMatrix(acInv[0], "XXXXXXXXX") != null)) {
+						&& (checkMatrix(acInv[0], "XXXXXXXXX") != null)
+						&& (energyStored >= (energyPerBlock * 9))) {
 					// Pattern:
 					// xxx
 					// xxx
 					// xxx
 					acInv[1] = checkMatrix(acInv[0], "XXXXXXXXX");
 					inputItems -= 9;
-					// DebugOut.debugMessage("updateEntity",
-					// "(inputItems-9) = "+ inputItems);
+					energyStored -= (energyPerBlock * 9);
 				}
 
 				if (inputItems > 0) {
@@ -137,6 +149,8 @@ public class TileEntityAutoCompressor extends TileEntity implements
 				} else {
 					acInv[0] = null;
 				}
+
+				acEnergyStorage.setEnergyStored(energyStored);
 			}
 		} catch (Exception e) {
 			DebugOut.debugException("Auto Compressor: updateEntity", e);
@@ -219,9 +233,9 @@ public class TileEntityAutoCompressor extends TileEntity implements
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound tagCompound) {
-		super.readFromNBT(tagCompound);
-		NBTTagList tagList = tagCompound.getTagList("Inventory",
+	public void readFromNBT(NBTTagCompound nbtData) {
+		super.readFromNBT(nbtData);
+		NBTTagList tagList = nbtData.getTagList("Inventory",
 				Constants.NBT.TAG_COMPOUND);
 		final String debugInt = "Tag Count: "
 				+ Integer.toString(tagList.tagCount());
@@ -233,11 +247,12 @@ public class TileEntityAutoCompressor extends TileEntity implements
 				acInv[slot] = ItemStack.loadItemStackFromNBT(tag);
 			}
 		}
+		acEnergyStorage.readFromNBT(nbtData);
 	}
 
 	@Override
-	public void writeToNBT(NBTTagCompound tagCompound) {
-		super.writeToNBT(tagCompound);
+	public void writeToNBT(NBTTagCompound nbtData) {
+		super.writeToNBT(nbtData);
 		NBTTagList itemList = new NBTTagList();
 		for (int i = 0; i < acInv.length; i++) {
 			ItemStack stack = acInv[i];
@@ -248,7 +263,8 @@ public class TileEntityAutoCompressor extends TileEntity implements
 				itemList.appendTag(tag);
 			}
 		}
-		tagCompound.setTag("Inventory", itemList);
+		nbtData.setTag("Inventory", itemList);
+		acEnergyStorage.writeToNBT(nbtData);
 	}
 
 	@Override
@@ -296,4 +312,33 @@ public class TileEntityAutoCompressor extends TileEntity implements
 			return false;
 		}
 	}
+
+	@Override
+	public boolean canConnectEnergy(ForgeDirection arg0) {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
+	@Override
+	public int receiveEnergy(ForgeDirection from, int maxReceive,
+			boolean simulate) {
+		return acEnergyStorage.receiveEnergy(maxReceive, simulate);
+	}
+
+	@Override
+	public int extractEnergy(ForgeDirection from, int maxExtract,
+			boolean simulate) {
+		return acEnergyStorage.extractEnergy(maxExtract, simulate);
+	}
+
+	@Override
+	public int getEnergyStored(ForgeDirection from) {
+		return acEnergyStorage.getEnergyStored();
+	}
+
+	@Override
+	public int getMaxEnergyStored(ForgeDirection from) {
+		return acEnergyStorage.getMaxEnergyStored();
+	}
+
 }

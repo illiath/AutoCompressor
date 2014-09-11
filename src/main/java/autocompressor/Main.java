@@ -45,9 +45,6 @@ public class Main {
 				"blockAutoCompressor").setCreativeTab(tabAutoCompressor)
 				.setBlockTextureName(MODID + ":" + "blockAutoCompressor"));
 
-		// Set it so any pick axe can break the block quickly.
-		BlockAutoCompressor.setHarvestLevel("pickaxe", 0);
-
 		// Register and add recipe information
 		GameRegistry.registerBlock(BlockAutoCompressor, "Auto Compressor");
 		GameRegistry.addShapedRecipe(new ItemStack(BlockAutoCompressor),
