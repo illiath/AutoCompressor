@@ -9,20 +9,20 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
 
 @Mod(modid = Main.MODID, version = Main.VERSION)
 public class Main {
 	public static final String			MODID				= "autocompressor";
-	public static final String			VERSION				= "0.2a";
+	public static final String			VERSION				= "0.2";
 
 	public WeakReference<EntityPlayer>	AutoCompressorPlayer;
 
@@ -48,10 +48,16 @@ public class Main {
 				'P', Blocks.piston, 'R', Items.redstone });
 		GameRegistry.registerTileEntity(TileEntityAutoCompressor.class, "blockAutoCompressor");
 		NetworkRegistry.INSTANCE.registerGuiHandler(MODID, new AutoCompressorGuiHandler());
+
 	}
 
-	public void test(World world) {
-		//
-		System.out.println("Blank code here.");
+	@EventHandler
+	public void preInit(FMLPreInitializationEvent event) {
+		SimpleNetworkWrapper acNetworkWrapper = NetworkRegistry.INSTANCE.newSimpleChannel(MODID.toLowerCase());
+
+		// Register for what message types we care about for this set of messages.
+		acNetworkWrapper.registerMessage(MessageACClient.class, MessageACClient.class, 1, Side.CLIENT);
+		acNetworkWrapper.registerMessage(MessageACServer.class, MessageACServer.class, 2, Side.SERVER);
 	}
+
 }

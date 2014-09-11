@@ -10,10 +10,6 @@ import net.minecraft.item.ItemStack;
 
 public class ContainerAutoCompressor extends Container {
 	protected TileEntityAutoCompressor	tileEntity;
-
-	public GuiCheckBox testBox1;
-	public GuiButton testButton1;
-
 	
 	public ContainerAutoCompressor(InventoryPlayer inventoryPlayer, TileEntityAutoCompressor te) {
 		tileEntity = te;
@@ -23,9 +19,6 @@ public class ContainerAutoCompressor extends Container {
 
 		// Output Slot
 		addSlotToContainer(new Slot(tileEntity, 1, 106, 18));
-
-		testButton1 = new GuiButton(2,10,25,20,20,"+");
-		testBox1 = new GuiCheckBox(3, 10,30, "2x2", true);
 		
 		bindPlayerInventory(inventoryPlayer);
 	}
@@ -37,7 +30,7 @@ public class ContainerAutoCompressor extends Container {
 
 	protected void bindPlayerInventory(InventoryPlayer inventoryPlayer) {
 		int xbase = 8;
-		int ybase = 49;
+		int ybase = 70;
 
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 9; j++) {

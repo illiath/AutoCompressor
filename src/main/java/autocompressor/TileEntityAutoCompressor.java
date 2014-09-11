@@ -11,6 +11,9 @@ import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -28,6 +31,7 @@ public class TileEntityAutoCompressor extends TileEntity implements ISidedInvent
 	public InventoryCrafting		craftMatrix		= new AutoCompressorCrafting();
 	private InventoryCraftResult	craftResult		= new InventoryCraftResult();
 
+	protected int[]					acRecipetList	= { 1, 1, 1 };
 	protected EnergyStorage			acEnergyStorage	= new EnergyStorage(5000);
 
 	// How much energy is used per block of the recipe.
@@ -40,7 +44,8 @@ public class TileEntityAutoCompressor extends TileEntity implements ISidedInvent
 
 	// Not even sure if this gets called.
 	public boolean shouldDropSlotWhenBroken(int slot) {
-
+		// Test it then...
+		DebugOut.debugMessage("shouldDropSlotWhenBroken", "Hey, we actually ran this code!");
 		return false;
 	}
 
@@ -330,6 +335,20 @@ public class TileEntityAutoCompressor extends TileEntity implements ISidedInvent
 	@Override
 	public int getMaxEnergyStored(ForgeDirection from) {
 		return acEnergyStorage.getMaxEnergyStored();
+	}
+
+	// Client Server Sync
+	@Override
+	public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
+		NBTTagCompound tagCom = pkt.func_148857_g();
+		this.readFromNBT(tagCom);
+	}
+
+	@Override
+	public Packet getDescriptionPacket() {
+		NBTTagCompound tagCom = new NBTTagCompound();
+		this.writeToNBT(tagCom);
+		return new S35PacketUpdateTileEntity(this.xCoord, this.yCoord, this.zCoord, this.blockMetadata, tagCom);
 	}
 
 }

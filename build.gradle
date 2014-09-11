@@ -30,7 +30,7 @@ else
     
 group               = "com.illiath.autocompressor" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName    = "autocompressor"
-version             = "0.2a-${buildnumber}"
+version             = "0.2-${buildnumber}"
 
 dependencies {
     // you may put jars on which you depend on in ./libs
