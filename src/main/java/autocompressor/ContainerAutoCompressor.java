@@ -1,5 +1,7 @@
 package autocompressor;
 
+import cpw.mods.fml.client.config.GuiCheckBox;
+import net.minecraft.client.gui.GuiButton;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
@@ -7,10 +9,13 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
 public class ContainerAutoCompressor extends Container {
-	protected TileEntityAutoCompressor tileEntity;
+	protected TileEntityAutoCompressor	tileEntity;
 
-	public ContainerAutoCompressor(InventoryPlayer inventoryPlayer,
-			TileEntityAutoCompressor te) {
+	public GuiCheckBox testBox1;
+	public GuiButton testButton1;
+
+	
+	public ContainerAutoCompressor(InventoryPlayer inventoryPlayer, TileEntityAutoCompressor te) {
 		tileEntity = te;
 
 		// Input Slot
@@ -19,6 +24,9 @@ public class ContainerAutoCompressor extends Container {
 		// Output Slot
 		addSlotToContainer(new Slot(tileEntity, 1, 106, 18));
 
+		testButton1 = new GuiButton(2,10,25,20,20,"+");
+		testBox1 = new GuiCheckBox(3, 10,30, "2x2", true);
+		
 		bindPlayerInventory(inventoryPlayer);
 	}
 
@@ -30,11 +38,10 @@ public class ContainerAutoCompressor extends Container {
 	protected void bindPlayerInventory(InventoryPlayer inventoryPlayer) {
 		int xbase = 8;
 		int ybase = 49;
-		
+
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 9; j++) {
-				addSlotToContainer(new Slot(inventoryPlayer, j + i * 9 + 9,
-						xbase + j * 18, ybase + i * 18));
+				addSlotToContainer(new Slot(inventoryPlayer, j + i * 9 + 9, xbase + j * 18, ybase + i * 18));
 			}
 		}
 
@@ -55,16 +62,13 @@ public class ContainerAutoCompressor extends Container {
 				ItemStack stackInSlot = slotObject.getStack();
 				stack = stackInSlot.copy();
 
-				// merges the item into player inventory since its in the
-				// tileEntity
+				// Block->Player Inventory
 				if (slot < 2) {
 					if (!this.mergeItemStack(stackInSlot, 2, 35, true)) {
 						return null;
 					}
-				}
-				// places it into the tileEntity is possible since its in the
-				// player inventory
-				else if (!this.mergeItemStack(stackInSlot, 0, 1, false)) {
+					// Player->Block Inventory
+				} else if (!this.mergeItemStack(stackInSlot, 0, 1, false)) {
 					return null;
 				}
 

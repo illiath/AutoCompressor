@@ -17,22 +17,21 @@ import net.minecraftforge.common.util.ForgeDirection;
 import cofh.api.energy.EnergyStorage;
 import cofh.api.energy.IEnergyHandler;
 
-public class TileEntityAutoCompressor extends TileEntity implements
-		ISidedInventory, IEnergyHandler {
+public class TileEntityAutoCompressor extends TileEntity implements ISidedInventory, IEnergyHandler {
 	// Variables
-	private ItemStack[] acInv;
-	private int acItemCount;
-	private ItemStack acInventory;
-	private SlotCrafting craftSlot;
-	private IRecipe craftingRecipe;
+	private ItemStack[]				acInv;
+	private int						acItemCount;
+	private ItemStack				acInventory;
+	private SlotCrafting			craftSlot;
+	private IRecipe					craftingRecipe;
 
-	public InventoryCrafting craftMatrix = new AutoCompressorCrafting();
-	private InventoryCraftResult craftResult = new InventoryCraftResult();
+	public InventoryCrafting		craftMatrix		= new AutoCompressorCrafting();
+	private InventoryCraftResult	craftResult		= new InventoryCraftResult();
 
-	protected EnergyStorage acEnergyStorage = new EnergyStorage(5000);
+	protected EnergyStorage			acEnergyStorage	= new EnergyStorage(5000);
 
 	// How much energy is used per block of the recipe.
-	private int energyPerBlock = 100;
+	private int						energyPerBlock	= 100;
 
 	// Start functions below
 	public TileEntityAutoCompressor() {
@@ -68,14 +67,12 @@ public class TileEntityAutoCompressor extends TileEntity implements
 				// Set crafting grid recipe
 				for (int gridPosition = 0; gridPosition < 9; gridPosition++) {
 					if (pattern.charAt(gridPosition) == 'X') {
-						craftMatrix.setInventorySlotContents(gridPosition,
-								craftingStack);
+						craftMatrix.setInventorySlotContents(gridPosition, craftingStack);
 					}
 				}
 
 				// Run the recipe check
-				testResult = CraftingManager.getInstance().findMatchingRecipe(
-						craftMatrix, getWorldObj());
+				testResult = CraftingManager.getInstance().findMatchingRecipe(craftMatrix, getWorldObj());
 
 				// Clear recipes and temp variables.
 				craftingStack = null;
@@ -109,9 +106,7 @@ public class TileEntityAutoCompressor extends TileEntity implements
 				// feels wrong to do :)
 				// TODO: Implement Control system to specify which pattern(s) to
 				// attempt.
-				if ((inputItems >= 9)
-						&& (checkMatrix(acInv[0], "XXXXXXXXX") != null)
-						&& (energyStored >= (energyPerBlock * 9))) {
+				if ((inputItems >= 9) && (checkMatrix(acInv[0], "XXXXXXXXX") != null) && (energyStored >= (energyPerBlock * 9))) {
 					// Pattern:
 					// xxx
 					// xxx
@@ -119,13 +114,11 @@ public class TileEntityAutoCompressor extends TileEntity implements
 					acInv[1] = checkMatrix(acInv[0], "XXXXXXXXX");
 					patternItems = 9;
 					/*
-					 * } else if ((inputItems >= 2) && (checkMatrix(acInv[0],
-					 * "X  X     ") != null) && (energyStored >= (energyPerBlock
-					 * * 2))) { // Pattern: // x // x // acInv[1] =
-					 * checkMatrix(acInv[0], "X  X     "); patternItems = 2;
+					 * } else if ((inputItems >= 2) && (checkMatrix(acInv[0], "X  X     ") != null) && (energyStored >=
+					 * (energyPerBlock * 2))) { // Pattern: // x // x // acInv[1] = checkMatrix(acInv[0], "X  X     ");
+					 * patternItems = 2;
 					 */
-				} else if ((inputItems >= 8)
-						&& (checkMatrix(acInv[0], "XXXX XXXX") != null)
+				} else if ((inputItems >= 8) && (checkMatrix(acInv[0], "XXXX XXXX") != null)
 						&& (energyStored >= (energyPerBlock * 8))) {
 					// Pattern:
 					// xxx
@@ -134,8 +127,7 @@ public class TileEntityAutoCompressor extends TileEntity implements
 					acInv[1] = checkMatrix(acInv[0], "XXXX XXXX");
 					patternItems = 8;
 
-				} else if ((inputItems >= 4)
-						&& (checkMatrix(acInv[0], "XX XX    ") != null)
+				} else if ((inputItems >= 4) && (checkMatrix(acInv[0], "XX XX    ") != null)
 						&& (energyStored >= (energyPerBlock * 4))) {
 					// Pattern:
 					// xx
@@ -219,8 +211,7 @@ public class TileEntityAutoCompressor extends TileEntity implements
 	@Override
 	public boolean isUseableByPlayer(EntityPlayer player) {
 		return worldObj.getTileEntity(xCoord, yCoord, zCoord) == this
-				&& player.getDistanceSq(xCoord + 0.5, yCoord + 0.5,
-						zCoord + 0.5) < 64;
+				&& player.getDistanceSq(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5) < 64;
 	}
 
 	@Override
@@ -239,10 +230,8 @@ public class TileEntityAutoCompressor extends TileEntity implements
 	@Override
 	public void readFromNBT(NBTTagCompound nbtData) {
 		super.readFromNBT(nbtData);
-		NBTTagList tagList = nbtData.getTagList("Inventory",
-				Constants.NBT.TAG_COMPOUND);
-		final String debugInt = "Tag Count: "
-				+ Integer.toString(tagList.tagCount());
+		NBTTagList tagList = nbtData.getTagList("Inventory", Constants.NBT.TAG_COMPOUND);
+		final String debugInt = "Tag Count: " + Integer.toString(tagList.tagCount());
 		for (int i = 0; i < tagList.tagCount(); i++) {
 			NBTTagCompound tag = (NBTTagCompound) tagList.getCompoundTagAt(i);
 
@@ -293,7 +282,8 @@ public class TileEntityAutoCompressor extends TileEntity implements
 	@Override
 	// We actually let all slots be accessible from all sides, this makes things
 	// easier
-	public int[] getAccessibleSlotsFromSide(int p_94128_1_) {
+			public
+			int[] getAccessibleSlotsFromSide(int p_94128_1_) {
 		int[] validSlots = { 0, 1 };
 
 		return validSlots;
@@ -307,8 +297,7 @@ public class TileEntityAutoCompressor extends TileEntity implements
 		if (slot == 0) {
 			// If the slot is empty, or already contains the same item, the slot
 			// can be have automation work with it
-			if ((getStackInSlot(slot) == null)
-					|| (stack.isItemEqual(getStackInSlot(slot)))) {
+			if ((getStackInSlot(slot) == null) || (stack.isItemEqual(getStackInSlot(slot)))) {
 				return true;
 			}
 			return false;
@@ -324,14 +313,12 @@ public class TileEntityAutoCompressor extends TileEntity implements
 	}
 
 	@Override
-	public int receiveEnergy(ForgeDirection from, int maxReceive,
-			boolean simulate) {
+	public int receiveEnergy(ForgeDirection from, int maxReceive, boolean simulate) {
 		return acEnergyStorage.receiveEnergy(maxReceive, simulate);
 	}
 
 	@Override
-	public int extractEnergy(ForgeDirection from, int maxExtract,
-			boolean simulate) {
+	public int extractEnergy(ForgeDirection from, int maxExtract, boolean simulate) {
 		return acEnergyStorage.extractEnergy(maxExtract, simulate);
 	}
 
