@@ -109,16 +109,7 @@ public class TileEntityAutoCompressor extends TileEntity implements
 				// feels wrong to do :)
 				// TODO: Implement Control system to specify which pattern(s) to
 				// attempt.
-				if ((inputItems >= 4)
-						&& (checkMatrix(acInv[0], "XX XX    ") != null)
-						&& (energyStored >= (energyPerBlock * 4))) {
-					// Pattern:
-					// xx
-					// xx
-					//
-					acInv[1] = checkMatrix(acInv[0], "XX XX    ");
-					patternItems = 4;
-				} else if ((inputItems >= 9)
+				if ((inputItems >= 9)
 						&& (checkMatrix(acInv[0], "XXXXXXXXX") != null)
 						&& (energyStored >= (energyPerBlock * 9))) {
 					// Pattern:
@@ -142,8 +133,17 @@ public class TileEntityAutoCompressor extends TileEntity implements
 					// xxx
 					acInv[1] = checkMatrix(acInv[0], "XXXX XXXX");
 					patternItems = 8;
-				}
 
+				} else if ((inputItems >= 4)
+						&& (checkMatrix(acInv[0], "XX XX    ") != null)
+						&& (energyStored >= (energyPerBlock * 4))) {
+					// Pattern:
+					// xx
+					// xx
+					//
+					acInv[1] = checkMatrix(acInv[0], "XX XX    ");
+					patternItems = 4;
+				}
 				// Process the patternItems
 				inputItems -= patternItems;
 				energyStored -= (energyPerBlock * patternItems);
