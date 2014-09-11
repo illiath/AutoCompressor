@@ -107,20 +107,10 @@ public class TileEntityAutoCompressor extends TileEntity implements
 
 				// Horrible pattern kludge, that works beautifully, but still
 				// feels wrong to do :)
-				if ((inputItems >= 2)
-						&& (checkMatrix(acInv[0], "X  X     ") != null)
-						&& (energyStored >= (energyPerBlock * 2))) {
-					// Run this first as it's the simplest form
-					// Pattern:
-					// x
-					// x
-					//
-					acInv[1] = checkMatrix(acInv[0], "X  X     ");
-					patternItems = 2;
-				} else if ((inputItems >= 4)
+				// TODO: Implement Control system to specify which pattern(s) to attempt.
+				if ((inputItems >= 4)
 						&& (checkMatrix(acInv[0], "XX XX    ") != null)
 						&& (energyStored >= (energyPerBlock * 4))) {
-					// Run this first as it's the simplest form
 					// Pattern:
 					// xx
 					// xx
@@ -136,6 +126,15 @@ public class TileEntityAutoCompressor extends TileEntity implements
 					// xxx
 					acInv[1] = checkMatrix(acInv[0], "XXXXXXXXX");
 					patternItems = 9;
+				} else if ((inputItems >= 2)
+						&& (checkMatrix(acInv[0], "X  X     ") != null)
+						&& (energyStored >= (energyPerBlock * 2))) {
+					// Pattern:
+					// x
+					// x
+					//
+					acInv[1] = checkMatrix(acInv[0], "X  X     ");
+					patternItems = 2;
 				} else if ((inputItems >= 8)
 						&& (checkMatrix(acInv[0], "XXXX XXXX") != null)
 						&& (energyStored >= (energyPerBlock * 8))) {
@@ -147,9 +146,8 @@ public class TileEntityAutoCompressor extends TileEntity implements
 					patternItems = 8;
 				}
 
-				
 				// Process the patternItems
-				inputItems   -= patternItems;
+				inputItems -= patternItems;
 				energyStored -= (energyPerBlock * patternItems);
 
 				// Save the changes to permanent storage
