@@ -103,35 +103,30 @@ public class TileEntityAutoCompressor extends TileEntity implements
 			if ((acInv[0] != null) && (acInv[1] == null)) {
 				int inputItems = acInv[0].stackSize;
 				int energyStored = acEnergyStorage.getEnergyStored();
-
-				// DebugOut.debugMessage("updateEntity", "RF Stored: "
-				// + energyStored);
-
-				// DebugOut.debugMessage("updateEntity", "inputItems: "+
-				// inputItems);
+				int patternItems = 0;
 
 				// Horrible pattern kludge, that works beautifully, but still
 				// feels wrong to do :)
-				if ((inputItems >= 4)
+				if ((inputItems >= 2)
+						&& (checkMatrix(acInv[0], "X  X     ") != null)
+						&& (energyStored >= (energyPerBlock * 2))) {
+					// Run this first as it's the simplest form
+					// Pattern:
+					// x
+					// x
+					//
+					acInv[1] = checkMatrix(acInv[0], "X  X     ");
+					patternItems = 2;
+				} else if ((inputItems >= 4)
 						&& (checkMatrix(acInv[0], "XX XX    ") != null)
 						&& (energyStored >= (energyPerBlock * 4))) {
+					// Run this first as it's the simplest form
 					// Pattern:
 					// xx
 					// xx
 					//
 					acInv[1] = checkMatrix(acInv[0], "XX XX    ");
-					inputItems -= 4;
-					energyStored -= (energyPerBlock * 4);
-				} else if ((inputItems >= 8)
-						&& (checkMatrix(acInv[0], "XXXX XXXX") != null)
-						&& (energyStored >= (energyPerBlock * 8))) {
-					// Pattern:
-					// xxx
-					// x x
-					// xxx
-					acInv[1] = checkMatrix(acInv[0], "XXXX XXXX");
-					inputItems -= 8;
-					energyStored -= (energyPerBlock * 8);
+					patternItems = 4;
 				} else if ((inputItems >= 9)
 						&& (checkMatrix(acInv[0], "XXXXXXXXX") != null)
 						&& (energyStored >= (energyPerBlock * 9))) {
@@ -140,16 +135,29 @@ public class TileEntityAutoCompressor extends TileEntity implements
 					// xxx
 					// xxx
 					acInv[1] = checkMatrix(acInv[0], "XXXXXXXXX");
-					inputItems -= 9;
-					energyStored -= (energyPerBlock * 9);
+					patternItems = 9;
+				} else if ((inputItems >= 8)
+						&& (checkMatrix(acInv[0], "XXXX XXXX") != null)
+						&& (energyStored >= (energyPerBlock * 8))) {
+					// Pattern:
+					// xxx
+					// x x
+					// xxx
+					acInv[1] = checkMatrix(acInv[0], "XXXX XXXX");
+					patternItems = 8;
 				}
 
+				
+				// Process the patternItems
+				inputItems   -= patternItems;
+				energyStored -= (energyPerBlock * patternItems);
+
+				// Save the changes to permanent storage
 				if (inputItems > 0) {
 					acInv[0].stackSize = inputItems;
 				} else {
 					acInv[0] = null;
 				}
-
 				acEnergyStorage.setEnergyStored(energyStored);
 			}
 		} catch (Exception e) {

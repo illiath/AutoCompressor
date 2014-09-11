@@ -22,7 +22,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 @Mod(modid = Main.MODID, version = Main.VERSION)
 public class Main {
 	public static final String MODID = "autocompressor";
-	public static final String VERSION = "0.1a";
+	public static final String VERSION = "0.1b";
 
 	public WeakReference<EntityPlayer> AutoCompressorPlayer;
 

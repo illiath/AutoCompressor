@@ -13,6 +13,6 @@ This software is under the Eclipse Public License (EPL) (http://www.eclipse.org/
 
 Notes on Code Comparisons
 =========================
-Segments of the code will appear similar to other mod authors code, some of this is due to the inability for their to be multiple ways to do a specific task, others are because I have looked at other code to see how they have done things. If you believe some of this code is a direct rip-off of your code please contact me privately and we can discuss the matter if it bothers you.
+Segments of the code will appear similar to other mod authors code, some of this is due to the inability for there to be multiple ways to do a specific task, others are because I have looked at other code to see how they have done things. If you believe some of this code is a direct rip-off of your code and is in violation of copyright/common-decency please contact me privately and we can discuss how I came up with that specific piece of code, I will happily remove something that is possible to be done multiple ways if the code is in violation of a copyright or if another mod author published the code but does not wish me to use it for any reason.
 
 At no point do I claim to have ownership of code I did not write myself, and as the mod is not officially released, don't come whining about copyright or anything else until I do release it (if ever), as I am using github as my source code repository for this mod, NOT as a method of release, and I'm too cheap to get an account that lets me hide my source code.
