@@ -224,7 +224,6 @@ pip-log.txt
 /docs/*
 /eclipse/*
 /forge/*
-/gradle/*
 /jars/*
 /lib/*
 /logs/*
@@ -241,6 +240,7 @@ pip-log.txt
 *.sh
 /*.txt
 
-gradlew
-build.gradle
+#gradlew
+#build.gradle
+#/gradle/*
 
