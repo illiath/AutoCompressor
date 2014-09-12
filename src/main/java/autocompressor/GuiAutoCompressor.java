@@ -58,34 +58,61 @@ public class GuiAutoCompressor extends GuiContainer {
 	public void updateScreen() {
 		super.updateScreen();
 
-		// TODO: Implement Client<->Server code here
-
+		// Testing
+		recipeButton1.displayString = "*";
+		this.buttonList.set(0, this.recipeButton1);
 	}
 
 	protected void actionPerformed(GuiButton guibutton) {
-		S35PacketUpdateTileEntity dataPacket;
+		// S35PacketUpdateTileEntity dataPacket;
 		int buttonPressed = -1;
 		// id is the id you give your button
 		switch (guibutton.id) {
 			case 0:
-				DebugOut.debugMessage("actionPerformed", "Button 1 Pressed");
+				try {
+					DebugOut.debugMessage("actionPerformed", "Button 0 Pressed");
+					Main.INSTANCE.sendToServer(new MessageACGUIButton0());
+				} catch (Exception e) {
+					DebugOut.debugException("GUIAutoCompressor:actionPerformed", e);
+				}
+
 				break;
 			case 1:
-				DebugOut.debugMessage("actionPerformed", "Button 2 Pressed");
+				try {
+					DebugOut.debugMessage("actionPerformed", "Button 1 Pressed");
+					Main.INSTANCE.sendToServer(new MessageACGUIButton1());
+				} catch (Exception e) {
+					DebugOut.debugException("GUIAutoCompressor:actionPerformed", e);
+				}
 				break;
 			case 2:
-				DebugOut.debugMessage("actionPerformed", "Button 3 Pressed");
+				try {
+					DebugOut.debugMessage("actionPerformed", "Button 2 Pressed");
+					Main.INSTANCE.sendToServer(new MessageACGUIButton2());
+				} catch (Exception e) {
+					DebugOut.debugException("GUIAutoCompressor:actionPerformed", e);
+				}
 				break;
 			case 3:
-				DebugOut.debugMessage("actionPerformed", "Button 4 Pressed");
+				try {
+					DebugOut.debugMessage("actionPerformed", "Button 3 Pressed");
+					Main.INSTANCE.sendToServer(new MessageACGUIButton3());
+				} catch (Exception e) {
+					DebugOut.debugException("GUIAutoCompressor:actionPerformed", e);
+				}
 				break;
 			case 4:
-				DebugOut.debugMessage("actionPerformed", "Button 5 Pressed");
+				try {
+					DebugOut.debugMessage("actionPerformed", "Button 4 Pressed");
+					Main.INSTANCE.sendToServer(new MessageACGUIButton4());
+				} catch (Exception e) {
+					DebugOut.debugException("GUIAutoCompressor:actionPerformed", e);
+				}
 				break;
 		}
-		if (buttonPressed > -1) {
-			// TODO: Implement Client<->Server code here
-			// PacketHandler.sendPacketToServer(dataPacket); // send packet
-		}
+		// if (buttonPressed > -1) {
+		// TODO: Implement Client<->Server code here
+		// PacketHandler.sendPacketToServer(dataPacket); // send packet
+		// }
 	}
 }

@@ -31,7 +31,7 @@ public class TileEntityAutoCompressor extends TileEntity implements ISidedInvent
 	public InventoryCrafting		craftMatrix		= new AutoCompressorCrafting();
 	private InventoryCraftResult	craftResult		= new InventoryCraftResult();
 
-	protected int[]					acRecipetList	= { 1, 1, 1 };
+	protected boolean[]				acRecipeList	= { true, true, true, true, true };
 	protected EnergyStorage			acEnergyStorage	= new EnergyStorage(5000);
 
 	// How much energy is used per block of the recipe.
@@ -43,10 +43,13 @@ public class TileEntityAutoCompressor extends TileEntity implements ISidedInvent
 	}
 
 	// Not even sure if this gets called.
+	// This doesn't seem to get called when in creative.
+	// TODO Sort out how to get this functional!
 	public boolean shouldDropSlotWhenBroken(int slot) {
 		// Test it then...
 		DebugOut.debugMessage("shouldDropSlotWhenBroken", "Hey, we actually ran this code!");
-		return false;
+
+		return true;
 	}
 
 	private class AutoCompressorCrafting extends InventoryCrafting {
@@ -107,10 +110,9 @@ public class TileEntityAutoCompressor extends TileEntity implements ISidedInvent
 				int energyStored = acEnergyStorage.getEnergyStored();
 				int patternItems = 0;
 
-				// Horrible pattern kludge, that works beautifully, but still
-				// feels wrong to do :)
-				// TODO: Implement Control system to specify which pattern(s) to
-				// attempt.
+				// Horrible pattern kludge, that works beautifully, but still feels wrong to do :)
+				// TODO: Implement Control system to specify which pattern(s) to attempt.
+
 				if ((inputItems >= 9) && (checkMatrix(acInv[0], "XXXXXXXXX") != null) && (energyStored >= (energyPerBlock * 9))) {
 					// Pattern:
 					// xxx
@@ -337,18 +339,23 @@ public class TileEntityAutoCompressor extends TileEntity implements ISidedInvent
 		return acEnergyStorage.getMaxEnergyStored();
 	}
 
-	// Client Server Sync
-	@Override
-	public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
-		NBTTagCompound tagCom = pkt.func_148857_g();
-		this.readFromNBT(tagCom);
+	public void toggleRecipe(int recipeNum) {
+		// TODO Make sure this does something, don't just gawk at it :)
+		DebugOut.debugMessage("toggleRecipe", "Hey, we think we're going to toggle the recipe " + recipeNum + ", woo!");
+		if (acRecipeList[recipeNum]) {
+			acRecipeList[recipeNum] = false;
+		} else {
+			acRecipeList[recipeNum] = true;
+		}
+	}
+
+	public boolean getRecipeValue(int recipeNum) {
+		DebugOut.debugMessage("setRecipes", "Hey, we want to know what is up with recipe " + recipeNum);
+		return acRecipeList[recipeNum];
 	}
 
 	@Override
 	public Packet getDescriptionPacket() {
-		NBTTagCompound tagCom = new NBTTagCompound();
-		this.writeToNBT(tagCom);
-		return new S35PacketUpdateTileEntity(this.xCoord, this.yCoord, this.zCoord, this.blockMetadata, tagCom);
+		return Main.INSTANCE.getPacketFrom(new MessageACGUIButton1(this));
 	}
-
 }

@@ -21,21 +21,24 @@ import cpw.mods.fml.relauncher.Side;
 
 @Mod(modid = Main.MODID, version = Main.VERSION)
 public class Main {
-	public static final String			MODID				= "autocompressor";
-	public static final String			VERSION				= "0.2";
+	public static final String					MODID				= "autocompressor";
+	public static final String					VERSION				= "0.2";
 
-	public WeakReference<EntityPlayer>	AutoCompressorPlayer;
+	public WeakReference<EntityPlayer>			AutoCompressorPlayer;
 
 	@Instance("illiath_autocompressor")
-	public static Main					instance;
+	public static Main							instance;
 
-	public static Block					BlockAutoCompressor;
+	public static Block							BlockAutoCompressor;
 
-	public static CreativeTabs			tabAutoCompressor	= new CreativeTabs("tabAutoCompressor") {
-																public Item getTabIconItem() {
-																	return Items.bed;
-																}
-															};
+	public static CreativeTabs					tabAutoCompressor	= new CreativeTabs("tabAutoCompressor") {
+																		public Item getTabIconItem() {
+																			return Items.bed;
+																		}
+																	};
+
+	public static final SimpleNetworkWrapper	INSTANCE			= NetworkRegistry.INSTANCE
+																			.newSimpleChannel(MODID.toLowerCase());
 
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
@@ -48,16 +51,16 @@ public class Main {
 				'P', Blocks.piston, 'R', Items.redstone });
 		GameRegistry.registerTileEntity(TileEntityAutoCompressor.class, "blockAutoCompressor");
 		NetworkRegistry.INSTANCE.registerGuiHandler(MODID, new AutoCompressorGuiHandler());
-
 	}
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		SimpleNetworkWrapper acNetworkWrapper = NetworkRegistry.INSTANCE.newSimpleChannel(MODID.toLowerCase());
-
 		// Register for what message types we care about for this set of messages.
-		acNetworkWrapper.registerMessage(MessageACClient.class, MessageACClient.class, 1, Side.CLIENT);
-		acNetworkWrapper.registerMessage(MessageACServer.class, MessageACServer.class, 2, Side.SERVER);
+		INSTANCE.registerMessage(MessageACGUIButton0.Handler.class, MessageACGUIButton0.class, 1, Side.SERVER);
+		INSTANCE.registerMessage(MessageACGUIButton1.Handler.class, MessageACGUIButton1.class, 2, Side.CLIENT);
+		INSTANCE.registerMessage(MessageACGUIButton2.Handler.class, MessageACGUIButton2.class, 3, Side.CLIENT);
+		INSTANCE.registerMessage(MessageACGUIButton3.Handler.class, MessageACGUIButton3.class, 4, Side.CLIENT);
+		INSTANCE.registerMessage(MessageACGUIButton4.Handler.class, MessageACGUIButton4.class, 5, Side.CLIENT);
 	}
 
 }
