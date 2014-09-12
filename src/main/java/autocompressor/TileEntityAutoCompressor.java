@@ -3,47 +3,36 @@ package autocompressor;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.inventory.InventoryCraftResult;
 import net.minecraft.inventory.InventoryCrafting;
-import net.minecraft.inventory.SlotCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
-import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.ForgeDirection;
+import autocompressor.recipes.AuthRecipe;
 import cofh.api.energy.EnergyStorage;
 import cofh.api.energy.IEnergyHandler;
 
 public class TileEntityAutoCompressor extends TileEntity implements ISidedInventory, IEnergyHandler {
 	// Variables
-	private ItemStack[]				acInv;
-	private int						acItemCount;
-	private ItemStack				acInventory;
-	private SlotCrafting			craftSlot;
-	private IRecipe					craftingRecipe;
+	private ItemStack[]			acInv;
+	private ItemStack			acInventory;
 
-	public InventoryCrafting		craftMatrix		= new AutoCompressorCrafting();
-	private InventoryCraftResult	craftResult		= new InventoryCraftResult();
+	private InventoryCrafting	craftMatrix		= new AutoCompressorCrafting();
+	protected EnergyStorage		acEnergyStorage	= new EnergyStorage(5000);
+	protected AuthRecipe		acAuthRecipe	= new AuthRecipe();
 
-	protected int[]					acRecipeList;
-	protected EnergyStorage			acEnergyStorage	= new EnergyStorage(5000);
+	// Block Defaults
+	// TODO Implement configuration file for this stuff...
 
 	// How much energy is used per block of the recipe.
-	private int						energyPerBlock	= 100;
+	private Integer				energyPerBlock	= 100;
 
 	// Start functions below
 	public TileEntityAutoCompressor() {
 		acInv = new ItemStack[10];
-		acRecipeList = new int[5];
-
-		acRecipeList[0] = 1;
-		acRecipeList[1] = 1;
-		acRecipeList[2] = 1;
-		acRecipeList[3] = 1;
-		acRecipeList[4] = 1;
 	}
 
 	// Not even sure if this gets called.
@@ -86,7 +75,7 @@ public class TileEntityAutoCompressor extends TileEntity implements ISidedInvent
 				// Run the recipe check
 				testResult = CraftingManager.getInstance().findMatchingRecipe(craftMatrix, getWorldObj());
 
-				// Clear recipes and temp variables.
+				// Clear recipes and temporary variables.
 				craftingStack = null;
 				for (int gridPosition = 0; gridPosition < 9; gridPosition++) {
 					craftMatrix.setInventorySlotContents(gridPosition, null);
@@ -104,71 +93,71 @@ public class TileEntityAutoCompressor extends TileEntity implements ISidedInvent
 	public void updateEntity() {
 		super.updateEntity();
 
+		if (worldObj == null) {
+			return;
+		}
+
 		if (worldObj.isRemote) {
 			return;
 		}
 
-		try {
-			/*
-			System.out.println("updateScreen: acRecipeList[0]:" + this.acRecipeList[0]);
-			System.out.println("updateScreen: acRecipeList[1]:" + this.acRecipeList[1]);
-			System.out.println("updateScreen: acRecipeList[2]:" + this.acRecipeList[2]);
-			System.out.println("updateScreen: acRecipeList[3]:" + this.acRecipeList[3]);
-			System.out.println("updateScreen: acRecipeList[4]:" + this.acRecipeList[4]);
-			*/
+		if ((acInv[0] != null) && (acInv[1] == null)) {
+			boolean[] authRecipe = acAuthRecipe.listAuthRecipes();
+			
+			debugRecipeList();
 
-			if ((acInv[0] != null) && (acInv[1] == null)) {
-				int inputItems = acInv[0].stackSize;
-				int energyStored = acEnergyStorage.getEnergyStored();
-				int patternItems = 0;
+			int inputItems = acInv[0].stackSize;
+			int energyStored = acEnergyStorage.getEnergyStored();
+			int patternItems = 0;
 
-				// Horrible pattern kludge, that works beautifully, but still feels wrong to do :)
-				// TODO: Implement Control system to specify which pattern(s) to attempt.
-
-				if ((inputItems >= 9) && (checkMatrix(acInv[0], "XXXXXXXXX") != null) && (energyStored >= (energyPerBlock * 9))) {
-					// Pattern:
-					// xxx
-					// xxx
-					// xxx
-					acInv[1] = checkMatrix(acInv[0], "XXXXXXXXX");
-					patternItems = 9;
-					/*
-					 * } else if ((inputItems >= 2) && (checkMatrix(acInv[0], "X  X     ") != null) && (energyStored >=
-					 * (energyPerBlock * 2))) { // Pattern: // x // x // acInv[1] = checkMatrix(acInv[0], "X  X     ");
-					 * patternItems = 2;
-					 */
-				} else if ((inputItems >= 8) && (checkMatrix(acInv[0], "XXXX XXXX") != null)
-						&& (energyStored >= (energyPerBlock * 8))) {
-					// Pattern:
-					// xxx
-					// x x
-					// xxx
-					acInv[1] = checkMatrix(acInv[0], "XXXX XXXX");
-					patternItems = 8;
-
-				} else if ((inputItems >= 4) && (checkMatrix(acInv[0], "XX XX    ") != null)
-						&& (energyStored >= (energyPerBlock * 4))) {
-					// Pattern:
-					// xx
-					// xx
-					//
+			// Horrible pattern kludge, that works beautifully, but still feels wrong to do :)
+			// Simple 2x2 pattern
+			if ((authRecipe[0]) && (checkMatrix(acInv[0], "XX XX    ") != null)) {
+				if ((inputItems >= 4) && (energyStored >= (energyPerBlock * 4))) {
 					acInv[1] = checkMatrix(acInv[0], "XX XX    ");
 					patternItems = 4;
 				}
-				// Process the patternItems
-				inputItems -= patternItems;
-				energyStored -= (energyPerBlock * patternItems);
 
-				// Save the changes to permanent storage
-				if (inputItems > 0) {
-					acInv[0].stackSize = inputItems;
-				} else {
-					acInv[0] = null;
+				// Simple 3x3 pattern
+			} else if ((authRecipe[1]) && (checkMatrix(acInv[0], "XXXXXXXXX") != null)) {
+				if ((inputItems >= 9) && (energyStored >= (energyPerBlock * 9))) {
+					acInv[1] = checkMatrix(acInv[0], "XXXXXXXXX");
+					patternItems = 9;
 				}
-				acEnergyStorage.setEnergyStored(energyStored);
+
+				// 3x3 with no center
+			} else if ((authRecipe[2]) && (checkMatrix(acInv[0], "XXXX XXXX") != null)) {
+				if ((inputItems >= 8) && (energyStored >= (energyPerBlock * 8))) {
+					acInv[1] = checkMatrix(acInv[0], "XXXX XXXX");
+					patternItems = 8;
+				}
+				// simple 2x1 pattern
+			} else if ((authRecipe[3]) && (checkMatrix(acInv[0], "X  X     ") != null)) {
+				if ((inputItems >= 2) && (energyStored >= (energyPerBlock * 2))) {
+					acInv[1] = checkMatrix(acInv[0], "X  X     ");
+					patternItems = 2;
+				}
+				// 3x3 with no center
+			} else if ((authRecipe[4]) && (checkMatrix(acInv[0], "XXX      ") != null)) {
+				if ((inputItems >= 3) && (energyStored >= (energyPerBlock * 3))) {
+					acInv[1] = checkMatrix(acInv[0], "XXX      ");
+					patternItems = 3;
+				}
 			}
-		} catch (Exception e) {
-			DebugOut.debugException("Auto Compressor: updateEntity", e);
+
+			// Use up items, this will actually destroy them...
+			inputItems -= patternItems;
+
+			// Use up the energy we need for the process
+			energyStored -= (energyPerBlock * patternItems);
+
+			// Save the changes to permanent storage
+			if (inputItems > 0) {
+				acInv[0].stackSize = inputItems;
+			} else {
+				acInv[0] = null;
+			}
+			acEnergyStorage.setEnergyStored(energyStored);
 		}
 	}
 
@@ -248,15 +237,10 @@ public class TileEntityAutoCompressor extends TileEntity implements ISidedInvent
 
 	@Override
 	public void readFromNBT(NBTTagCompound nbtData) {
-		super.readFromNBT(nbtData);
 		int[] approvedRecipes = {};
 
 		System.out.println("------------------------------");
-		System.out.println("readFromNBT: acRecipeList[0]:" + this.acRecipeList[0]);
-		System.out.println("readFromNBT: acRecipeList[1]:" + this.acRecipeList[1]);
-		System.out.println("readFromNBT: acRecipeList[2]:" + this.acRecipeList[2]);
-		System.out.println("readFromNBT: acRecipeList[3]:" + this.acRecipeList[3]);
-		System.out.println("readFromNBT: acRecipeList[4]:" + this.acRecipeList[4]);
+		debugRecipeList();
 
 		// Read the Inventory
 		NBTTagList tagList = nbtData.getTagList("Inventory", Constants.NBT.TAG_COMPOUND);
@@ -268,31 +252,22 @@ public class TileEntityAutoCompressor extends TileEntity implements ISidedInvent
 			}
 		}
 
-		// Read the Authorized Recipe List
-		NBTTagList authorizedRecipeList = nbtData.getTagList("Recipe", Constants.NBT.TAG_COMPOUND);
-		for (int i = 0; i < 5; i++) {
-			NBTTagCompound tag = (NBTTagCompound) authorizedRecipeList.getCompoundTagAt(i);
-			int recipe = tag.getInteger(Integer.toString(i));
-			if (Integer.toString(recipe).isEmpty()) {
-				recipe = 1;
-			}
-			System.out.println("readFromNBT: Recipe " + i + ": " + recipe);
-			this.acRecipeList[i] = recipe;
-		}
-
 		// Read the energy stored
 		acEnergyStorage.readFromNBT(nbtData);
+		acAuthRecipe.readFromNBT(nbtData);
+
+		super.readFromNBT(nbtData);
 	}
 
 	@Override
 	public void writeToNBT(NBTTagCompound nbtData) {
-		super.writeToNBT(nbtData);
 		System.out.println("------------------------------");
-		System.out.println("writeToNBT: acRecipeList[0]:" + this.acRecipeList[0]);
-		System.out.println("writeToNBT: acRecipeList[1]:" + this.acRecipeList[1]);
-		System.out.println("writeToNBT: acRecipeList[2]:" + this.acRecipeList[2]);
-		System.out.println("writeToNBT: acRecipeList[3]:" + this.acRecipeList[3]);
-		System.out.println("writeToNBT: acRecipeList[4]:" + this.acRecipeList[4]);
+		System.out.println("x: " + this.xCoord);
+		System.out.println("x: " + this.yCoord);
+		System.out.println("x: " + this.zCoord);
+
+		// Testing of pattern system
+		debugRecipeList();
 		System.out.println("------------------------------");
 
 		// Write the Inventory
@@ -308,19 +283,17 @@ public class TileEntityAutoCompressor extends TileEntity implements ISidedInvent
 		}
 		nbtData.setTag("Inventory", tagList);
 
-		// Write the Recipe Activations
-		NBTTagList authorizedRecipeList = new NBTTagList();
-		for (int i = 0; i < 5; i++) {
-			int tempValue = Integer.valueOf(this.acRecipeList[i]);
-			NBTTagCompound tag = new NBTTagCompound();
-			tag.setInteger(Integer.toString(i), tempValue);
-			authorizedRecipeList.appendTag(tag);
-			System.out.println("writeToNBT: Recipe " + i + ": " + tempValue);
+		try {
+			acAuthRecipe.writeToNBT(nbtData);
+		} catch (Exception errorE) {
+			DebugOut.debugException("writeToNBT", errorE);
 		}
-		nbtData.setTag("Recipe", authorizedRecipeList);
 
 		// Write the energy in the block
 		acEnergyStorage.writeToNBT(nbtData);
+
+		// Call the original process
+		super.writeToNBT(nbtData);
 	}
 
 	@Override
@@ -395,10 +368,23 @@ public class TileEntityAutoCompressor extends TileEntity implements ISidedInvent
 	}
 
 	public void toggleRecipe(int recipeNum) {
-		if (acRecipeList[recipeNum] == 0) {
-			acRecipeList[recipeNum] = 1;
-		} else {
-			acRecipeList[recipeNum] = 0;
-		}
+		boolean[] authRecipe = acAuthRecipe.listAuthRecipes();
+		
+		acAuthRecipe.toggleAuthRecipe(recipeNum);
+
+		authRecipe = acAuthRecipe.listAuthRecipes();
+	}
+
+	public boolean[] getRecipeList() {
+		return acAuthRecipe.listAuthRecipes();
+	}
+	
+	public void debugRecipeList() {
+		boolean[] authRecipe = acAuthRecipe.listAuthRecipes();	
+		System.out.println("recipe[0]:" + authRecipe[0]);
+		System.out.println("recipe[1]:" + authRecipe[1]);
+		System.out.println("recipe[2]:" + authRecipe[2]);
+		System.out.println("recipe[3]:" + authRecipe[3]);
+		System.out.println("recipe[4]:" + authRecipe[4]);	
 	}
 }

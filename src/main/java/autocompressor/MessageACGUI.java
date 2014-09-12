@@ -46,23 +46,11 @@ public class MessageACGUI implements IMessage {
 		 */
 		@Override
 		public IMessage onMessage(MessageACGUI message, MessageContext ctx) {
-			/*
-			 * DebugOut.debugMessage("MessageACClient:onMessage", "Hey, we got a message! It was sent from x:" +
-			 * message.x + ", y:"+ message.y + ", z:" + message.z);
-			 */
-
 			TileEntity tileEntity = FMLClientHandler.instance().getClient().theWorld.getTileEntity(message.x, message.y, message.z);
 
 			if (tileEntity instanceof TileEntityAutoCompressor) {
 				((TileEntityAutoCompressor) tileEntity).toggleRecipe(message.whichButton);
-//				ctx.getServerHandler().playerEntity.worldObj.markBlockForUpdate(message.x, message.y, message.z);
 			}
-
-			/*
-			 * // get the player and add a chat message ctx.getServerHandler().playerEntity.addChatComponentMessage(new
-			 * ChatComponentText( "AC GUI Button 0 pressed, need to toggle value"));
-			 * DebugOut.debugMessage("MessageACClient:onMessage", "Stuff should have just been spat into chat...");
-			 */
 
 			return null;
 		}
