@@ -55,12 +55,8 @@ public class Main {
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		// Register for what message types we care about for this set of messages.
-		INSTANCE.registerMessage(MessageACGUIButton0.Handler.class, MessageACGUIButton0.class, 1, Side.SERVER);
-		INSTANCE.registerMessage(MessageACGUIButton1.Handler.class, MessageACGUIButton1.class, 2, Side.CLIENT);
-		INSTANCE.registerMessage(MessageACGUIButton2.Handler.class, MessageACGUIButton2.class, 3, Side.CLIENT);
-		INSTANCE.registerMessage(MessageACGUIButton3.Handler.class, MessageACGUIButton3.class, 4, Side.CLIENT);
-		INSTANCE.registerMessage(MessageACGUIButton4.Handler.class, MessageACGUIButton4.class, 5, Side.CLIENT);
+		// We actually have only the one set of messages
+		INSTANCE.registerMessage(MessageACGUI.Handler.class, MessageACGUI.class, 1, Side.SERVER);
 	}
 
 }

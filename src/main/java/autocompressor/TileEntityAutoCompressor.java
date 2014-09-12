@@ -341,7 +341,8 @@ public class TileEntityAutoCompressor extends TileEntity implements ISidedInvent
 
 	public void toggleRecipe(int recipeNum) {
 		// TODO Make sure this does something, don't just gawk at it :)
-		DebugOut.debugMessage("toggleRecipe", "Hey, we think we're going to toggle the recipe " + recipeNum + ", woo!");
+		DebugOut.debugMessage("toggleRecipe", "Hey, we think we're going to toggle the recipe " + recipeNum
+				+ ", it is currently set " + acRecipeList[recipeNum]);
 		if (acRecipeList[recipeNum]) {
 			acRecipeList[recipeNum] = false;
 		} else {
@@ -356,6 +357,14 @@ public class TileEntityAutoCompressor extends TileEntity implements ISidedInvent
 
 	@Override
 	public Packet getDescriptionPacket() {
-		return Main.INSTANCE.getPacketFrom(new MessageACGUIButton1(this));
+		NBTTagCompound tagCompound = new NBTTagCompound();
+		this.writeToNBT(tagCompound);
+		return new S35PacketUpdateTileEntity(this.xCoord, this.yCoord, this.zCoord, 1, tagCompound);
+	}
+
+	@Override
+	public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
+		readFromNBT(pkt.func_148857_g());
+		worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
 	}
 }

@@ -8,16 +8,19 @@ import net.minecraft.util.ResourceLocation;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 
 public class GuiAutoCompressor extends GuiContainer {
-	public ResourceLocation	GUITexture	= new ResourceLocation(Main.MODID, "textures/gui/gui.png");
+	public ResourceLocation				GUITexture	= new ResourceLocation(Main.MODID, "textures/gui/gui.png");
 
-	public GuiButton		recipeButton1;
-	public GuiButton		recipeButton2;
-	public GuiButton		recipeButton3;
-	public GuiButton		recipeButton4;
-	public GuiButton		recipeButton5;
+	public GuiButton					recipeButton1;
+	public GuiButton					recipeButton2;
+	public GuiButton					recipeButton3;
+	public GuiButton					recipeButton4;
+	public GuiButton					recipeButton5;
+
+	private TileEntityAutoCompressor	tileEntityAC;
 
 	public GuiAutoCompressor(InventoryPlayer inventoryPlayer, TileEntityAutoCompressor tileEntity) {
 		super(new ContainerAutoCompressor(inventoryPlayer, tileEntity));
+		this.tileEntityAC = tileEntity;
 	}
 
 	@Override
@@ -64,55 +67,31 @@ public class GuiAutoCompressor extends GuiContainer {
 	}
 
 	protected void actionPerformed(GuiButton guibutton) {
-		// S35PacketUpdateTileEntity dataPacket;
-		int buttonPressed = -1;
-		// id is the id you give your button
-		switch (guibutton.id) {
-			case 0:
-				try {
-					DebugOut.debugMessage("actionPerformed", "Button 0 Pressed");
-					Main.INSTANCE.sendToServer(new MessageACGUIButton0());
-				} catch (Exception e) {
-					DebugOut.debugException("GUIAutoCompressor:actionPerformed", e);
-				}
-
-				break;
-			case 1:
-				try {
-					DebugOut.debugMessage("actionPerformed", "Button 1 Pressed");
-					Main.INSTANCE.sendToServer(new MessageACGUIButton1());
-				} catch (Exception e) {
-					DebugOut.debugException("GUIAutoCompressor:actionPerformed", e);
-				}
-				break;
-			case 2:
-				try {
-					DebugOut.debugMessage("actionPerformed", "Button 2 Pressed");
-					Main.INSTANCE.sendToServer(new MessageACGUIButton2());
-				} catch (Exception e) {
-					DebugOut.debugException("GUIAutoCompressor:actionPerformed", e);
-				}
-				break;
-			case 3:
-				try {
-					DebugOut.debugMessage("actionPerformed", "Button 3 Pressed");
-					Main.INSTANCE.sendToServer(new MessageACGUIButton3());
-				} catch (Exception e) {
-					DebugOut.debugException("GUIAutoCompressor:actionPerformed", e);
-				}
-				break;
-			case 4:
-				try {
-					DebugOut.debugMessage("actionPerformed", "Button 4 Pressed");
-					Main.INSTANCE.sendToServer(new MessageACGUIButton4());
-				} catch (Exception e) {
-					DebugOut.debugException("GUIAutoCompressor:actionPerformed", e);
-				}
-				break;
+		try {
+			switch (guibutton.id) {
+				case 0:
+					// DebugOut.debugMessage("actionPerformed", "Button 0 Pressed");
+					Main.INSTANCE.sendToServer(new MessageACGUI(tileEntityAC, 0));
+					break;
+				case 1:
+					// DebugOut.debugMessage("actionPerformed", "Button 1 Pressed");
+					Main.INSTANCE.sendToServer(new MessageACGUI(tileEntityAC, 1));
+					break;
+				case 2:
+					// DebugOut.debugMessage("actionPerformed", "Button 2 Pressed");
+					Main.INSTANCE.sendToServer(new MessageACGUI(tileEntityAC, 2));
+					break;
+				case 3:
+					// DebugOut.debugMessage("actionPerformed", "Button 3 Pressed");
+					Main.INSTANCE.sendToServer(new MessageACGUI(tileEntityAC, 3));
+					break;
+				case 4:
+					// DebugOut.debugMessage("actionPerformed", "Button 4 Pressed");
+					Main.INSTANCE.sendToServer(new MessageACGUI(tileEntityAC, 4));
+					break;
+			}
+		} catch (Exception e) {
+			DebugOut.debugException("GUIAutoCompressor:actionPerformed", e);
 		}
-		// if (buttonPressed > -1) {
-		// TODO: Implement Client<->Server code here
-		// PacketHandler.sendPacketToServer(dataPacket); // send packet
-		// }
 	}
 }
