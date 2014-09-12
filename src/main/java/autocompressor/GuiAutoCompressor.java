@@ -61,9 +61,51 @@ public class GuiAutoCompressor extends GuiContainer {
 	public void updateScreen() {
 		super.updateScreen();
 
-		// Testing
-		recipeButton1.displayString = "*";
+		/*
+		System.out.println("updateScreen: acRecipeList[0]:" + tileEntityAC.acRecipeList[0]);
+		System.out.println("updateScreen: acRecipeList[1]:" + tileEntityAC.acRecipeList[1]);
+		System.out.println("updateScreen: acRecipeList[2]:" + tileEntityAC.acRecipeList[2]);
+		System.out.println("updateScreen: acRecipeList[3]:" + tileEntityAC.acRecipeList[3]);
+		System.out.println("updateScreen: acRecipeList[4]:" + tileEntityAC.acRecipeList[4]);
+		*/
+
+		// Update with button information
+		if (tileEntityAC.acRecipeList[0] == 1) {
+			recipeButton1.displayString = "*";
+		} else {
+			recipeButton1.displayString = "-";
+		}
+
+		if (tileEntityAC.acRecipeList[1] == 1) {
+			recipeButton2.displayString = "*";
+		} else {
+			recipeButton2.displayString = "-";
+		}
+
+		if (tileEntityAC.acRecipeList[2] == 1) {
+			recipeButton3.displayString = "*";
+		} else {
+			recipeButton3.displayString = "-";
+		}
+
+		if (tileEntityAC.acRecipeList[3] == 1) {
+			recipeButton4.displayString = "*";
+		} else {
+			recipeButton4.displayString = "-";
+		}
+
+		if (tileEntityAC.acRecipeList[4] == 1) {
+			recipeButton5.displayString = "*";
+		} else {
+			recipeButton5.displayString = "-";
+		}
+
+		// Update the button list
 		this.buttonList.set(0, this.recipeButton1);
+		this.buttonList.set(1, this.recipeButton2);
+		this.buttonList.set(2, this.recipeButton3);
+		this.buttonList.set(3, this.recipeButton4);
+		this.buttonList.set(4, this.recipeButton5);
 	}
 
 	protected void actionPerformed(GuiButton guibutton) {
@@ -93,5 +135,10 @@ public class GuiAutoCompressor extends GuiContainer {
 		} catch (Exception e) {
 			DebugOut.debugException("GUIAutoCompressor:actionPerformed", e);
 		}
+		System.out.println("updateScreen: acRecipeList[0]:" + tileEntityAC.acRecipeList[0]);
+		System.out.println("updateScreen: acRecipeList[1]:" + tileEntityAC.acRecipeList[1]);
+		System.out.println("updateScreen: acRecipeList[2]:" + tileEntityAC.acRecipeList[2]);
+		System.out.println("updateScreen: acRecipeList[3]:" + tileEntityAC.acRecipeList[3]);
+		System.out.println("updateScreen: acRecipeList[4]:" + tileEntityAC.acRecipeList[4]);
 	}
 }

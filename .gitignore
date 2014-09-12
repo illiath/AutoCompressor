@@ -236,7 +236,7 @@ pip-log.txt
 /src/minecraft_server/*
 /src/cofh/*
 
-*.bat
+/*/*.bat
 *.sh
 /*.txt
 

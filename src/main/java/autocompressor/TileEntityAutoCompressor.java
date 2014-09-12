@@ -11,9 +11,6 @@ import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.Packet;
-import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -31,7 +28,7 @@ public class TileEntityAutoCompressor extends TileEntity implements ISidedInvent
 	public InventoryCrafting		craftMatrix		= new AutoCompressorCrafting();
 	private InventoryCraftResult	craftResult		= new InventoryCraftResult();
 
-	protected boolean[]				acRecipeList	= { true, true, true, true, true };
+	protected int[]					acRecipeList;
 	protected EnergyStorage			acEnergyStorage	= new EnergyStorage(5000);
 
 	// How much energy is used per block of the recipe.
@@ -40,6 +37,13 @@ public class TileEntityAutoCompressor extends TileEntity implements ISidedInvent
 	// Start functions below
 	public TileEntityAutoCompressor() {
 		acInv = new ItemStack[10];
+		acRecipeList = new int[5];
+
+		acRecipeList[0] = 1;
+		acRecipeList[1] = 1;
+		acRecipeList[2] = 1;
+		acRecipeList[3] = 1;
+		acRecipeList[4] = 1;
 	}
 
 	// Not even sure if this gets called.
@@ -105,6 +109,14 @@ public class TileEntityAutoCompressor extends TileEntity implements ISidedInvent
 		}
 
 		try {
+			/*
+			System.out.println("updateScreen: acRecipeList[0]:" + this.acRecipeList[0]);
+			System.out.println("updateScreen: acRecipeList[1]:" + this.acRecipeList[1]);
+			System.out.println("updateScreen: acRecipeList[2]:" + this.acRecipeList[2]);
+			System.out.println("updateScreen: acRecipeList[3]:" + this.acRecipeList[3]);
+			System.out.println("updateScreen: acRecipeList[4]:" + this.acRecipeList[4]);
+			*/
+
 			if ((acInv[0] != null) && (acInv[1] == null)) {
 				int inputItems = acInv[0].stackSize;
 				int energyStored = acEnergyStorage.getEnergyStored();
@@ -237,33 +249,77 @@ public class TileEntityAutoCompressor extends TileEntity implements ISidedInvent
 	@Override
 	public void readFromNBT(NBTTagCompound nbtData) {
 		super.readFromNBT(nbtData);
+		int[] approvedRecipes = {};
+
+		System.out.println("------------------------------");
+		System.out.println("readFromNBT: acRecipeList[0]:" + this.acRecipeList[0]);
+		System.out.println("readFromNBT: acRecipeList[1]:" + this.acRecipeList[1]);
+		System.out.println("readFromNBT: acRecipeList[2]:" + this.acRecipeList[2]);
+		System.out.println("readFromNBT: acRecipeList[3]:" + this.acRecipeList[3]);
+		System.out.println("readFromNBT: acRecipeList[4]:" + this.acRecipeList[4]);
+
+		// Read the Inventory
 		NBTTagList tagList = nbtData.getTagList("Inventory", Constants.NBT.TAG_COMPOUND);
-		final String debugInt = "Tag Count: " + Integer.toString(tagList.tagCount());
 		for (int i = 0; i < tagList.tagCount(); i++) {
 			NBTTagCompound tag = (NBTTagCompound) tagList.getCompoundTagAt(i);
-
 			byte slot = tag.getByte("Slot");
 			if (slot >= 0 && slot < acInv.length) {
-				acInv[slot] = ItemStack.loadItemStackFromNBT(tag);
+				this.acInv[slot] = ItemStack.loadItemStackFromNBT(tag);
 			}
 		}
+
+		// Read the Authorized Recipe List
+		NBTTagList authorizedRecipeList = nbtData.getTagList("Recipe", Constants.NBT.TAG_COMPOUND);
+		for (int i = 0; i < 5; i++) {
+			NBTTagCompound tag = (NBTTagCompound) authorizedRecipeList.getCompoundTagAt(i);
+			int recipe = tag.getInteger(Integer.toString(i));
+			if (Integer.toString(recipe).isEmpty()) {
+				recipe = 1;
+			}
+			System.out.println("readFromNBT: Recipe " + i + ": " + recipe);
+			this.acRecipeList[i] = recipe;
+		}
+
+		// Read the energy stored
 		acEnergyStorage.readFromNBT(nbtData);
 	}
 
 	@Override
 	public void writeToNBT(NBTTagCompound nbtData) {
 		super.writeToNBT(nbtData);
-		NBTTagList itemList = new NBTTagList();
-		for (int i = 0; i < acInv.length; i++) {
-			ItemStack stack = acInv[i];
+		System.out.println("------------------------------");
+		System.out.println("writeToNBT: acRecipeList[0]:" + this.acRecipeList[0]);
+		System.out.println("writeToNBT: acRecipeList[1]:" + this.acRecipeList[1]);
+		System.out.println("writeToNBT: acRecipeList[2]:" + this.acRecipeList[2]);
+		System.out.println("writeToNBT: acRecipeList[3]:" + this.acRecipeList[3]);
+		System.out.println("writeToNBT: acRecipeList[4]:" + this.acRecipeList[4]);
+		System.out.println("------------------------------");
+
+		// Write the Inventory
+		NBTTagList tagList = new NBTTagList();
+		for (int i = 0; i < this.acInv.length; i++) {
+			ItemStack stack = this.acInv[i];
 			if (stack != null) {
 				NBTTagCompound tag = new NBTTagCompound();
 				tag.setByte("Slot", (byte) i);
 				stack.writeToNBT(tag);
-				itemList.appendTag(tag);
+				tagList.appendTag(tag);
 			}
 		}
-		nbtData.setTag("Inventory", itemList);
+		nbtData.setTag("Inventory", tagList);
+
+		// Write the Recipe Activations
+		NBTTagList authorizedRecipeList = new NBTTagList();
+		for (int i = 0; i < 5; i++) {
+			int tempValue = Integer.valueOf(this.acRecipeList[i]);
+			NBTTagCompound tag = new NBTTagCompound();
+			tag.setInteger(Integer.toString(i), tempValue);
+			authorizedRecipeList.appendTag(tag);
+			System.out.println("writeToNBT: Recipe " + i + ": " + tempValue);
+		}
+		nbtData.setTag("Recipe", authorizedRecipeList);
+
+		// Write the energy in the block
 		acEnergyStorage.writeToNBT(nbtData);
 	}
 
@@ -287,8 +343,7 @@ public class TileEntityAutoCompressor extends TileEntity implements ISidedInvent
 	}
 
 	@Override
-	// We actually let all slots be accessible from all sides, this makes things
-	// easier
+	// We actually let all slots be accessible from all sides, this makes things easier
 			public
 			int[] getAccessibleSlotsFromSide(int p_94128_1_) {
 		int[] validSlots = { 0, 1 };
@@ -340,31 +395,10 @@ public class TileEntityAutoCompressor extends TileEntity implements ISidedInvent
 	}
 
 	public void toggleRecipe(int recipeNum) {
-		// TODO Make sure this does something, don't just gawk at it :)
-		DebugOut.debugMessage("toggleRecipe", "Hey, we think we're going to toggle the recipe " + recipeNum
-				+ ", it is currently set " + acRecipeList[recipeNum]);
-		if (acRecipeList[recipeNum]) {
-			acRecipeList[recipeNum] = false;
+		if (acRecipeList[recipeNum] == 0) {
+			acRecipeList[recipeNum] = 1;
 		} else {
-			acRecipeList[recipeNum] = true;
+			acRecipeList[recipeNum] = 0;
 		}
-	}
-
-	public boolean getRecipeValue(int recipeNum) {
-		DebugOut.debugMessage("setRecipes", "Hey, we want to know what is up with recipe " + recipeNum);
-		return acRecipeList[recipeNum];
-	}
-
-	@Override
-	public Packet getDescriptionPacket() {
-		NBTTagCompound tagCompound = new NBTTagCompound();
-		this.writeToNBT(tagCompound);
-		return new S35PacketUpdateTileEntity(this.xCoord, this.yCoord, this.zCoord, 1, tagCompound);
-	}
-
-	@Override
-	public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
-		readFromNBT(pkt.func_148857_g());
-		worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
 	}
 }

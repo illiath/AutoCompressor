@@ -13,7 +13,6 @@ public class MessageACGUI implements IMessage {
 	public int	y;
 	public int	z;
 	public int	whichButton;
-	public int[] buttonStatus;
 
 	public MessageACGUI() {
 	}
@@ -27,7 +26,6 @@ public class MessageACGUI implements IMessage {
 
 	@Override
 	public void fromBytes(ByteBuf buf) {
-		//DebugOut.debugMessage("MessageACClient:fromBytes", "Decoding Message");
 		this.x = buf.readInt();
 		this.y = buf.readInt();
 		this.z = buf.readInt();
@@ -36,7 +34,6 @@ public class MessageACGUI implements IMessage {
 
 	@Override
 	public void toBytes(ByteBuf buf) {
-		//DebugOut.debugMessage("MessageACClient:toBytes", "Encoding Message");
 		buf.writeInt(this.x);
 		buf.writeInt(this.y);
 		buf.writeInt(this.z);
@@ -58,7 +55,7 @@ public class MessageACGUI implements IMessage {
 
 			if (tileEntity instanceof TileEntityAutoCompressor) {
 				((TileEntityAutoCompressor) tileEntity).toggleRecipe(message.whichButton);
-				ctx.getServerHandler().playerEntity.worldObj.markBlockForUpdate(message.x, message.y, message.z);
+//				ctx.getServerHandler().playerEntity.worldObj.markBlockForUpdate(message.x, message.y, message.z);
 			}
 
 			/*
