@@ -1,5 +1,7 @@
-package autocompressor;
+package autocompressor.machine;
 
+import autocompressor.DebugOut;
+import autocompressor.Main;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiLabel;
 import net.minecraft.client.gui.inventory.GuiContainer;

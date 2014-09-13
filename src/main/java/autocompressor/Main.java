@@ -9,6 +9,9 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import autocompressor.machine.AutoCompressorGuiHandler;
+import autocompressor.machine.BlockAutoCompressor;
+import autocompressor.machine.TileEntityAutoCompressor;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
@@ -17,7 +20,6 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
 
 @Mod(modid = Main.MODID, version = Main.VERSION)
 public class Main {
@@ -56,7 +58,7 @@ public class Main {
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		// We actually have only the one set of messages
-		INSTANCE.registerMessage(MessageACGUI.Handler.class, MessageACGUI.class, 1, Side.SERVER);
+		// INSTANCE.registerMessage(MessageACGUI.class, MessageACGUI.class, 1, Side.SERVER);
 	}
 
 }

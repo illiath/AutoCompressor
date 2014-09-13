@@ -1,4 +1,4 @@
-package autocompressor;
+package autocompressor.machine;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
@@ -11,18 +11,19 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.ForgeDirection;
+import autocompressor.DebugOut;
 import autocompressor.recipes.AuthRecipe;
 import cofh.api.energy.EnergyStorage;
 import cofh.api.energy.IEnergyHandler;
 
 public class TileEntityAutoCompressor extends TileEntity implements ISidedInventory, IEnergyHandler {
 	// Variables
-	private ItemStack[]			acInv;
-	private ItemStack			acInventory;
+	protected ItemStack[]		acInv;
+	protected ItemStack			acInventory;
 
-	private InventoryCrafting	craftMatrix		= new AutoCompressorCrafting();
-	protected EnergyStorage		acEnergyStorage	= new EnergyStorage(5000);
-	protected AuthRecipe		acAuthRecipe	= new AuthRecipe();
+	protected InventoryCrafting	craftMatrix;
+	protected EnergyStorage		acEnergyStorage;
+	protected AuthRecipe		acAuthRecipe;
 
 	// Block Defaults
 	// TODO Implement configuration file for this stuff...
@@ -33,6 +34,9 @@ public class TileEntityAutoCompressor extends TileEntity implements ISidedInvent
 	// Start functions below
 	public TileEntityAutoCompressor() {
 		acInv = new ItemStack[10];
+		acAuthRecipe = new AuthRecipe();
+		craftMatrix = new AutoCompressorCrafting();
+		acEnergyStorage = new EnergyStorage(5000);
 	}
 
 	// Not even sure if this gets called.
@@ -103,7 +107,7 @@ public class TileEntityAutoCompressor extends TileEntity implements ISidedInvent
 
 		if ((acInv[0] != null) && (acInv[1] == null)) {
 			boolean[] authRecipe = acAuthRecipe.listAuthRecipes();
-			
+
 			debugRecipeList();
 
 			int inputItems = acInv[0].stackSize;
@@ -261,6 +265,9 @@ public class TileEntityAutoCompressor extends TileEntity implements ISidedInvent
 
 	@Override
 	public void writeToNBT(NBTTagCompound nbtData) {
+		// Call the original process
+		super.writeToNBT(nbtData);
+
 		System.out.println("------------------------------");
 		System.out.println("x: " + this.xCoord);
 		System.out.println("x: " + this.yCoord);
@@ -292,8 +299,6 @@ public class TileEntityAutoCompressor extends TileEntity implements ISidedInvent
 		// Write the energy in the block
 		acEnergyStorage.writeToNBT(nbtData);
 
-		// Call the original process
-		super.writeToNBT(nbtData);
 	}
 
 	@Override
@@ -369,7 +374,7 @@ public class TileEntityAutoCompressor extends TileEntity implements ISidedInvent
 
 	public void toggleRecipe(int recipeNum) {
 		boolean[] authRecipe = acAuthRecipe.listAuthRecipes();
-		
+
 		acAuthRecipe.toggleAuthRecipe(recipeNum);
 
 		authRecipe = acAuthRecipe.listAuthRecipes();
@@ -378,13 +383,13 @@ public class TileEntityAutoCompressor extends TileEntity implements ISidedInvent
 	public boolean[] getRecipeList() {
 		return acAuthRecipe.listAuthRecipes();
 	}
-	
+
 	public void debugRecipeList() {
-		boolean[] authRecipe = acAuthRecipe.listAuthRecipes();	
+		boolean[] authRecipe = acAuthRecipe.listAuthRecipes();
 		System.out.println("recipe[0]:" + authRecipe[0]);
 		System.out.println("recipe[1]:" + authRecipe[1]);
 		System.out.println("recipe[2]:" + authRecipe[2]);
 		System.out.println("recipe[3]:" + authRecipe[3]);
-		System.out.println("recipe[4]:" + authRecipe[4]);	
+		System.out.println("recipe[4]:" + authRecipe[4]);
 	}
 }

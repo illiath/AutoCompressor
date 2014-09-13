@@ -1,14 +1,13 @@
-package autocompressor;
+package autocompressor.machine;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ChatComponentText;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 
-public class MessageACGUI implements IMessage {
+public class MessageACGUI implements IMessage, IMessageHandler<MessageACGUI, IMessage> {
 	public int	x;
 	public int	y;
 	public int	z;
@@ -40,19 +39,17 @@ public class MessageACGUI implements IMessage {
 		buf.writeInt(this.whichButton);
 	}
 
-	public static class Handler implements IMessageHandler<MessageACGUI, IMessage> {
-		/**
-		 * This gets called when the packet is read and received.
-		 */
-		@Override
-		public IMessage onMessage(MessageACGUI message, MessageContext ctx) {
-			TileEntity tileEntity = FMLClientHandler.instance().getClient().theWorld.getTileEntity(message.x, message.y, message.z);
+	/*
+	 * This gets called when the packet is read and received.
+	 */
+	@Override
+	public IMessage onMessage(MessageACGUI message, MessageContext ctx) {
+		TileEntity tileEntity = FMLClientHandler.instance().getClient().theWorld.getTileEntity(message.x, message.y, message.z);
 
-			if (tileEntity instanceof TileEntityAutoCompressor) {
-				((TileEntityAutoCompressor) tileEntity).toggleRecipe(message.whichButton);
-			}
-
-			return null;
+		if (tileEntity instanceof TileEntityAutoCompressor) {
+			((TileEntityAutoCompressor) tileEntity).toggleRecipe(message.whichButton);
 		}
+
+		return null;
 	}
 }

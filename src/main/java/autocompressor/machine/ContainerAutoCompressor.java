@@ -1,5 +1,6 @@
-package autocompressor;
+package autocompressor.machine;
 
+import autocompressor.DebugOut;
 import cpw.mods.fml.client.config.GuiCheckBox;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.entity.player.EntityPlayer;

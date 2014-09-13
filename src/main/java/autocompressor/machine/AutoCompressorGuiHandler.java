@@ -1,4 +1,4 @@
-package autocompressor;
+package autocompressor.machine;
 
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.entity.player.EntityPlayer;
