@@ -54,11 +54,4 @@ public class Main {
 		GameRegistry.registerTileEntity(TileEntityAutoCompressor.class, "blockAutoCompressor");
 		NetworkRegistry.INSTANCE.registerGuiHandler(MODID, new AutoCompressorGuiHandler());
 	}
-
-	@EventHandler
-	public void preInit(FMLPreInitializationEvent event) {
-		// We actually have only the one set of messages
-		// INSTANCE.registerMessage(MessageACGUI.class, MessageACGUI.class, 1, Side.SERVER);
-	}
-
 }
