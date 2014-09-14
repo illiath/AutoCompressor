@@ -1,4 +1,4 @@
-package autocompressor.machine;
+package autocompressor.mark2;
 
 import java.util.Random;
 
@@ -18,7 +18,7 @@ import autocompressor.Main;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-public class BlockAutoCompressor extends BlockContainer {
+public class BlockACMark2 extends BlockContainer {
 	@SideOnly(Side.CLIENT)
 	public static IIcon	acBlockTopIcon;
 	@SideOnly(Side.CLIENT)
@@ -26,11 +26,15 @@ public class BlockAutoCompressor extends BlockContainer {
 	@SideOnly(Side.CLIENT)
 	public static IIcon	acBlockSideIcon;
 
-	public BlockAutoCompressor() {
+	static {
+		Main.INSTANCE.registerMessage(ACGUIMark2MessageHandler.class, ACGUIMark2MessageHandler.class, 1, Side.SERVER);
+	}
+
+	public BlockACMark2() {
 		super(Material.rock);
 
 		// Set the block options
-		setBlockName("blockAutoCompressor");
+		setBlockName("blockAutoCompressorMk2");
 		setCreativeTab(Main.tabAutoCompressor);
 		setHardness(2.0F);
 		setHarvestLevel("pickaxe", 0); // This means the block is destroyed if we break it by hand...
@@ -38,7 +42,7 @@ public class BlockAutoCompressor extends BlockContainer {
 
 	@Override
 	public TileEntity createNewTileEntity(World p_149915_1_, int p_149915_2_) {
-		return new TileEntityAutoCompressor();
+		return new TEACMark2();
 	}
 
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int metadata, float fl1, float fl2,
@@ -53,15 +57,15 @@ public class BlockAutoCompressor extends BlockContainer {
 			return false;
 		}
 
-		player.openGui(Main.MODID, 0, world, x, y, z);
+		player.openGui(Main.MODID, 1, world, x, y, z);
 		return true;
 	}
 
 	@SideOnly(Side.CLIENT)
 	public void registerBlockIcons(IIconRegister iconList) {
-		acBlockTopIcon = iconList.registerIcon(Main.MODID + ":" + "blockAutoCompressor_top");
+		acBlockTopIcon = iconList.registerIcon(Main.MODID + ":" + "blockAutoCompressorMk2_top");
 		acBlockBottomIcon = iconList.registerIcon(Main.MODID + ":" + "blockAutoCompressor_bottom");
-		acBlockSideIcon = iconList.registerIcon(Main.MODID + ":" + "blockAutoCompressor_side");
+		acBlockSideIcon = iconList.registerIcon(Main.MODID + ":" + "blockAutoCompressorMk2_side");
 	}
 
 	@Override

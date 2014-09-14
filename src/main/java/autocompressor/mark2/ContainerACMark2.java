@@ -1,4 +1,4 @@
-package autocompressor.machine;
+package autocompressor.mark2;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -7,10 +7,10 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import autocompressor.DebugOut;
 
-public class ContainerAutoCompressor extends Container {
-	protected TileEntityAutoCompressor	tileEntity;
-	
-	public ContainerAutoCompressor(InventoryPlayer inventoryPlayer, TileEntityAutoCompressor te) {
+public class ContainerACMark2 extends Container {
+	protected TEACMark2	tileEntity;
+
+	public ContainerACMark2(InventoryPlayer inventoryPlayer, TEACMark2 te) {
 		tileEntity = te;
 
 		// Input Slot
@@ -18,7 +18,7 @@ public class ContainerAutoCompressor extends Container {
 
 		// Output Slot
 		addSlotToContainer(new Slot(tileEntity, 1, 106, 18));
-		
+
 		bindPlayerInventory(inventoryPlayer);
 	}
 

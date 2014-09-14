@@ -1,4 +1,4 @@
-package autocompressor.machine;
+package autocompressor.mark2;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.tileentity.TileEntity;
@@ -7,16 +7,16 @@ import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 
-public class MessageACGUI implements IMessage, IMessageHandler<MessageACGUI, IMessage> {
+public class ACGUIMark2MessageHandler implements IMessage, IMessageHandler<ACGUIMark2MessageHandler, IMessage> {
 	public int	x;
 	public int	y;
 	public int	z;
 	public int	whichButton;
 
-	public MessageACGUI() {
+	public ACGUIMark2MessageHandler() {
 	}
 
-	public MessageACGUI(TileEntityAutoCompressor tileEntityAC, int buttonPressed) {
+	public ACGUIMark2MessageHandler(TEACMark2 tileEntityAC, int buttonPressed) {
 		this.x = tileEntityAC.xCoord;
 		this.y = tileEntityAC.yCoord;
 		this.z = tileEntityAC.zCoord;
@@ -43,11 +43,11 @@ public class MessageACGUI implements IMessage, IMessageHandler<MessageACGUI, IMe
 	 * This gets called when the packet is read and received.
 	 */
 	@Override
-	public IMessage onMessage(MessageACGUI message, MessageContext ctx) {
+	public IMessage onMessage(ACGUIMark2MessageHandler message, MessageContext ctx) {
 		TileEntity tileEntity = FMLClientHandler.instance().getClient().theWorld.getTileEntity(message.x, message.y, message.z);
 
-		if (tileEntity instanceof TileEntityAutoCompressor) {
-			((TileEntityAutoCompressor) tileEntity).toggleRecipe(message.whichButton);
+		if (tileEntity instanceof TEACMark2) {
+			((TEACMark2) tileEntity).toggleRecipe(message.whichButton);
 		}
 
 		return null;

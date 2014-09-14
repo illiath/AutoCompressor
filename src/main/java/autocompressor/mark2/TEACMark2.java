@@ -1,4 +1,4 @@
-package autocompressor.machine;
+package autocompressor.mark2;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
@@ -8,30 +8,48 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.ForgeDirection;
 import autocompressor.DebugOut;
+import autocompressor.recipes.AuthRecipe;
 import cofh.api.energy.EnergyStorage;
 import cofh.api.energy.IEnergyHandler;
 
-public class TileEntityAutoCompressor extends TileEntity implements ISidedInventory, IEnergyHandler {
+public class TEACMark2 extends TileEntity implements ISidedInventory, IEnergyHandler {
 	// Variables
 	protected ItemStack[]		acInv;
 	protected ItemStack			acInventory;
 
 	protected InventoryCrafting	craftMatrix;
 	protected EnergyStorage		acEnergyStorage;
+	protected AuthRecipe		acAuthRecipe;
 
-	// This should be configured
+	// Block Defaults
+	// TODO Implement configuration file for this stuff...
+
 	// How much energy is used per block of the recipe.
 	private Integer				energyPerBlock	= 100;
 
 	// Start functions below
-	public TileEntityAutoCompressor() {
+	public TEACMark2() {
 		acInv = new ItemStack[10];
+		acAuthRecipe = new AuthRecipe();
 		craftMatrix = new AutoCompressorCrafting();
 		acEnergyStorage = new EnergyStorage(5000);
+	}
+
+	// Not even sure if this gets called.
+	// This doesn't seem to get called when in creative.
+	// TODO Sort out how to get this functional!
+	public boolean shouldDropSlotWhenBroken(int slot) {
+		// Test it then...
+		DebugOut.debugMessage("shouldDropSlotWhenBroken", "Hey, we actually ran this code!");
+
+		return true;
 	}
 
 	private class AutoCompressorCrafting extends InventoryCrafting {
@@ -91,28 +109,46 @@ public class TileEntityAutoCompressor extends TileEntity implements ISidedInvent
 		}
 
 		if ((acInv[0] != null) && (acInv[1] == null)) {
+			boolean[] authRecipe = acAuthRecipe.listAuthRecipes();
+
+			debugRecipeList();
+
 			int inputItems = acInv[0].stackSize;
 			int energyStored = acEnergyStorage.getEnergyStored();
 			int patternItems = 0;
 
 			// Horrible pattern kludge, that works beautifully, but still feels wrong to do :)
-			// Simple 3x3 pattern
-			if (checkMatrix(acInv[0], "XXXXXXXXX") != null) {
+			// Simple 2x2 pattern
+			if ((authRecipe[0]) && (checkMatrix(acInv[0], "XX XX    ") != null)) {
+				if ((inputItems >= 4) && (energyStored >= (energyPerBlock * 4))) {
+					acInv[1] = checkMatrix(acInv[0], "XX XX    ");
+					patternItems = 4;
+				}
+
+				// Simple 3x3 pattern
+			} else if ((authRecipe[1]) && (checkMatrix(acInv[0], "XXXXXXXXX") != null)) {
 				if ((inputItems >= 9) && (energyStored >= (energyPerBlock * 9))) {
 					acInv[1] = checkMatrix(acInv[0], "XXXXXXXXX");
 					patternItems = 9;
 				}
+
 				// 3x3 with no center
-			} else if (checkMatrix(acInv[0], "XXXX XXXX") != null) {
+			} else if ((authRecipe[2]) && (checkMatrix(acInv[0], "XXXX XXXX") != null)) {
 				if ((inputItems >= 8) && (energyStored >= (energyPerBlock * 8))) {
 					acInv[1] = checkMatrix(acInv[0], "XXXX XXXX");
 					patternItems = 8;
 				}
-				// Simple 2x2 pattern
-			} else if (checkMatrix(acInv[0], "XX XX    ") != null) {
-				if ((inputItems >= 4) && (energyStored >= (energyPerBlock * 4))) {
-					acInv[1] = checkMatrix(acInv[0], "XX XX    ");
-					patternItems = 4;
+				// simple 2x1 pattern
+			} else if ((authRecipe[3]) && (checkMatrix(acInv[0], "X  X     ") != null)) {
+				if ((inputItems >= 2) && (energyStored >= (energyPerBlock * 2))) {
+					acInv[1] = checkMatrix(acInv[0], "X  X     ");
+					patternItems = 2;
+				}
+				// 3x3 with no center
+			} else if ((authRecipe[4]) && (checkMatrix(acInv[0], "XXX      ") != null)) {
+				if ((inputItems >= 3) && (energyStored >= (energyPerBlock * 3))) {
+					acInv[1] = checkMatrix(acInv[0], "XXX      ");
+					patternItems = 3;
 				}
 			}
 
@@ -208,7 +244,10 @@ public class TileEntityAutoCompressor extends TileEntity implements ISidedInvent
 
 	@Override
 	public void readFromNBT(NBTTagCompound nbtData) {
-		super.readFromNBT(nbtData);
+		int[] approvedRecipes = {};
+
+		System.out.println("------------------------------");
+		debugRecipeList();
 
 		// Read the Inventory
 		NBTTagList tagList = nbtData.getTagList("Inventory", Constants.NBT.TAG_COMPOUND);
@@ -222,12 +261,24 @@ public class TileEntityAutoCompressor extends TileEntity implements ISidedInvent
 
 		// Read the energy stored
 		acEnergyStorage.readFromNBT(nbtData);
+		acAuthRecipe.readFromNBT(nbtData);
+
+		super.readFromNBT(nbtData);
 	}
 
 	@Override
 	public void writeToNBT(NBTTagCompound nbtData) {
 		// Call the original process
 		super.writeToNBT(nbtData);
+
+		System.out.println("------------------------------");
+		System.out.println("x: " + this.xCoord);
+		System.out.println("x: " + this.yCoord);
+		System.out.println("x: " + this.zCoord);
+
+		// Testing of pattern system
+		debugRecipeList();
+		System.out.println("------------------------------");
 
 		// Write the Inventory
 		NBTTagList tagList = new NBTTagList();
@@ -242,8 +293,15 @@ public class TileEntityAutoCompressor extends TileEntity implements ISidedInvent
 		}
 		nbtData.setTag("Inventory", tagList);
 
+		try {
+			acAuthRecipe.writeToNBT(nbtData);
+		} catch (Exception errorE) {
+			DebugOut.debugException("writeToNBT", errorE);
+		}
+
 		// Write the energy in the block
 		acEnergyStorage.writeToNBT(nbtData);
+
 	}
 
 	@Override
@@ -315,5 +373,47 @@ public class TileEntityAutoCompressor extends TileEntity implements ISidedInvent
 	@Override
 	public int getMaxEnergyStored(ForgeDirection from) {
 		return acEnergyStorage.getMaxEnergyStored();
+	}
+
+	public void toggleRecipe(int recipeNum) {
+		boolean[] authRecipe = acAuthRecipe.listAuthRecipes();
+
+		acAuthRecipe.toggleAuthRecipe(recipeNum);
+
+		authRecipe = acAuthRecipe.listAuthRecipes();
+	}
+
+	public boolean[] getRecipeList() {
+		return acAuthRecipe.listAuthRecipes();
+	}
+
+	public void debugRecipeList() {
+		boolean[] authRecipe = acAuthRecipe.listAuthRecipes();
+		System.out.println("recipe[0]:" + authRecipe[0]);
+		System.out.println("recipe[1]:" + authRecipe[1]);
+		System.out.println("recipe[2]:" + authRecipe[2]);
+		System.out.println("recipe[3]:" + authRecipe[3]);
+		System.out.println("recipe[4]:" + authRecipe[4]);
+	}
+	
+	@Override
+	public void invalidate() 
+	{
+		super.invalidate();
+	}
+
+	@Override
+	public Packet getDescriptionPacket()
+	{
+		NBTTagCompound nbtData = new NBTTagCompound();
+		this.writeToNBT(nbtData);
+		return new S35PacketUpdateTileEntity(this.xCoord, this.yCoord, this.zCoord, 2, nbtData);
+	}
+	        
+	@Override
+	public void onDataPacket(NetworkManager netManager, S35PacketUpdateTileEntity packet)
+	{
+//		NBTTagCompound nbtData = new NBTTagCompound();
+//		this.readFromNBT(nbtData);
 	}
 }
