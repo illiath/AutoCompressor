@@ -1,4 +1,4 @@
-package autocompressor.mark2;
+package autocompressor.mk2;
 
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiLabel;

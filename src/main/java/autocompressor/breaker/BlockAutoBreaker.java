@@ -1,4 +1,4 @@
-package autocompressor.machine;
+package autocompressor.breaker;
 
 import java.util.Random;
 
@@ -8,6 +8,8 @@ import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -15,30 +17,43 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import autocompressor.Main;
+import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-public class BlockAutoCompressor extends BlockContainer {
+public class BlockAutoBreaker extends BlockContainer {
 	@SideOnly(Side.CLIENT)
-	public static IIcon	acBlockTopIcon;
+	public static IIcon	acBreakerTopIcon;
 	@SideOnly(Side.CLIENT)
-	public static IIcon	acBlockBottomIcon;
+	public static IIcon	acBreakerBottomIcon;
 	@SideOnly(Side.CLIENT)
-	public static IIcon	acBlockSideIcon;
+	public static IIcon	acBreakerSideIcon;
 
-	public BlockAutoCompressor() {
+	public BlockAutoBreaker() {
 		super(Material.rock);
 
 		// Set the block options
-		setBlockName("blockAutoCompressor");
+		setBlockName("blockAutoBreaker");
 		setCreativeTab(Main.tabAutoCompressor);
 		setHardness(2.0F);
 		setHarvestLevel("pickaxe", 0); // This means the block is destroyed if we break it by hand...
 	}
 
+	public void registerBlock(BlockAutoBreaker block) {
+		// Register the block with minecraft
+		GameRegistry.registerBlock(block, "Auto Breaker");
+
+		// Register the recipe with minecraft
+		GameRegistry.addShapedRecipe(new ItemStack(block), new Object[] { "PO ", "CR ", " ", 'O', Blocks.obsidian, 'P',
+				Blocks.piston, 'R', Items.redstone, 'C', Blocks.chest });
+
+		// Register the TileEntity class with the block class
+		GameRegistry.registerTileEntity(TileEntityAutoBreaker.class, "blockAutoBreaker");
+	}
+
 	@Override
 	public TileEntity createNewTileEntity(World p_149915_1_, int p_149915_2_) {
-		return new TileEntityAutoCompressor();
+		return new TileEntityAutoBreaker();
 	}
 
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int metadata, float fl1, float fl2,
@@ -53,26 +68,26 @@ public class BlockAutoCompressor extends BlockContainer {
 			return false;
 		}
 
-		player.openGui(Main.MODID, 0, world, x, y, z);
+		player.openGui(Main.MODID, 2, world, x, y, z);
 		return true;
 	}
 
 	@SideOnly(Side.CLIENT)
 	public void registerBlockIcons(IIconRegister iconList) {
-		acBlockTopIcon = iconList.registerIcon(Main.MODID + ":" + "blockAutoCompressor_top");
-		acBlockBottomIcon = iconList.registerIcon(Main.MODID + ":" + "blockAutoCompressor_bottom");
-		acBlockSideIcon = iconList.registerIcon(Main.MODID + ":" + "blockAutoCompressor_side");
+		acBreakerTopIcon = iconList.registerIcon(Main.MODID + ":" + "blockAutoBreaker_top");
+		acBreakerBottomIcon = iconList.registerIcon(Main.MODID + ":" + "blockAutoCompressor_bottom");
+		acBreakerSideIcon = iconList.registerIcon(Main.MODID + ":" + "blockAutoBreaker_side");
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
 	public IIcon getIcon(int side, int metadata) {
 		if (side == 0) {
-			return acBlockBottomIcon;
+			return acBreakerBottomIcon;
 		} else if (side == 1) {
-			return acBlockTopIcon;
+			return acBreakerTopIcon;
 		} else {
-			return acBlockSideIcon;
+			return acBreakerSideIcon;
 		}
 	}
 

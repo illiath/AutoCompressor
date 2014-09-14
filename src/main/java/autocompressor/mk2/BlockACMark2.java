@@ -1,4 +1,4 @@
-package autocompressor.mark2;
+package autocompressor.mk2;
 
 import java.util.Random;
 
@@ -8,6 +8,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -15,6 +16,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import autocompressor.Main;
+import autocompressor.mk1.BlockAutoCompressor;
+import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -38,6 +41,17 @@ public class BlockACMark2 extends BlockContainer {
 		setCreativeTab(Main.tabAutoCompressor);
 		setHardness(2.0F);
 		setHarvestLevel("pickaxe", 0); // This means the block is destroyed if we break it by hand...
+	}
+
+	public void registerBlock(BlockACMark2 block, BlockAutoCompressor blockMk1) {
+		// Register the block with minecraft
+		GameRegistry.registerBlock(block, "Auto Compressor Mk2");
+		
+		// Register the recipe with minecraft
+		GameRegistry.addShapelessRecipe(new ItemStack(block), Blocks.crafting_table, blockMk1);
+
+		// Register the TileEntity class with the block class
+		GameRegistry.registerTileEntity(TEACMark2.class, "BlockACMark2");
 	}
 
 	@Override

@@ -1,4 +1,4 @@
-package autocompressor.machine;
+package autocompressor.mk1;
 
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.InventoryPlayer;

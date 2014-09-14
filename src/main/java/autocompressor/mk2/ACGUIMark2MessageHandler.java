@@ -1,4 +1,4 @@
-package autocompressor.mark2;
+package autocompressor.mk2;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.tileentity.TileEntity;

@@ -1,4 +1,4 @@
-package autocompressor.mark2;
+package autocompressor.breaker;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -7,10 +7,10 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import autocompressor.DebugOut;
 
-public class ContainerACMark2 extends Container {
-	protected TEACMark2	tileEntity;
-
-	public ContainerACMark2(InventoryPlayer inventoryPlayer, TEACMark2 te) {
+public class ContainerAutoBreaker extends Container {
+	protected TileEntityAutoBreaker	tileEntity;
+	
+	public ContainerAutoBreaker(InventoryPlayer inventoryPlayer, TileEntityAutoBreaker te) {
 		tileEntity = te;
 
 		// Input Slot
@@ -18,7 +18,7 @@ public class ContainerACMark2 extends Container {
 
 		// Output Slot
 		addSlotToContainer(new Slot(tileEntity, 1, 106, 18));
-
+		
 		bindPlayerInventory(inventoryPlayer);
 	}
 
@@ -76,7 +76,7 @@ public class ContainerACMark2 extends Container {
 				slotObject.onPickupFromSlot(player, stackInSlot);
 			}
 		} catch (Exception e) {
-			DebugOut.debugException("Auto Compressor: transferStackInSlot", e);
+			DebugOut.debugException("Auto Breaker: transferStackInSlot", e);
 		}
 		return stack;
 	}
