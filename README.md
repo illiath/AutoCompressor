@@ -5,11 +5,13 @@ Minecraft mod that provides an RF-powered block compressor.
 
 The mod is currently undergoing development, until the core is done, please don't complain at me if the mod doesn't work, or if it works in a manner you don't like or anything else.
 
-At this time, the mod is NOT for general release, heck, I'm fairly sure I have useless code, extra stuff, and the mod will explode horribly and eat your cat, goldfish, server, or anything else it can get it's hands on, it is well in pre-alpha at this point.
+At this time, the mod is NOT for general release, heck, I'm fairly sure I have useless code, extra stuff, and the mod will explode horribly and eat your cat, goldfish, server, or anything else it can get it's hands on, it is very much pre-alpha at this point.
+
 
 License
 =======
 This software is under the Eclipse Public License (EPL) (http://www.eclipse.org/org/documents/epl-v10.html).
+
 
 Notes on Code Comparisons
 =========================

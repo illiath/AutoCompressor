@@ -44,8 +44,16 @@ public class BlockAutoBreaker extends BlockContainer {
 		GameRegistry.registerBlock(block, "Auto Breaker");
 
 		// Register the recipe with minecraft
-		GameRegistry.addShapedRecipe(new ItemStack(block), new Object[] { "PO ", "CR ", " ", 'O', Blocks.obsidian, 'P',
-				Blocks.piston, 'R', Items.redstone, 'C', Blocks.chest });
+		GameRegistry.addShapedRecipe(new ItemStack(block), new Object[] {
+			"PO ",
+			"CR ",
+			"   ",
+			'P', Blocks.piston,
+			'O', Blocks.obsidian,
+			'C', Blocks.chest,
+			'R', Items.redstone
+			}
+		);
 
 		// Register the TileEntity class with the block class
 		GameRegistry.registerTileEntity(TileEntityAutoBreaker.class, "blockAutoBreaker");
